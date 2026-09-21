@@ -1,0 +1,61 @@
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+
+from app.database.database import SessionLocal
+from app.models.profile import Profile
+from app.ml.matching_service import matching_service
+
+router = APIRouter(prefix="/api/matches", tags=["Matches"])
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+@router.get("/{mentee_id}")
+def get_matches(mentee_id: int, db: Session = Depends(get_db)):
+    mentee = db.query(Profile).filter(
+        Profile.id == mentee_id,
+        Profile.role == "mentee"
+    ).first()
+
+    if not mentee:
+        raise HTTPException(
+            status_code=404,
+            detail="Mentee profile not found"
+        )
+
+    mentors = db.query(Profile).filter(
+        Profile.role == "mentor"
+    ).all()
+
+    matches = []
+
+    for mentor in mentors:
+        similarity = matching_service.similarity(
+            mentee,
+            mentor
+        )
+
+        matches.append({
+            "id": mentor.id,
+            "career_domain": mentor.career_domain,
+            "career_path": mentor.career_path,
+            "experience": mentor.experience,
+            "skills": mentor.skills.split(","),
+            "similarity_score": round(similarity * 100, 2)
+        })
+
+    matches.sort(
+        key=lambda x: x["similarity_score"],
+        reverse=True
+    )
+
+    return {
+        "mentee_id": mentee.id,
+        "matches": matches
+    }
