@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from app.database.database import engine, Base
+from app.models.user import User
+from app.models.profile import Profile
 from app.api.profiles import router as profile_router
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.matches import router as matches_router

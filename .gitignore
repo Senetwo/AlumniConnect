@@ -30,7 +30,6 @@ build/
 coverage/
 
 # Machine learning
-models/
 model_cache/
 .cache/
 huggingface/
