@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.database.database import SessionLocal
 from app.models.profile import Profile
+from app.models.user import User
 from app.ml.matching_service import matching_service
 
 router = APIRouter(prefix="/api/matches", tags=["Matches"])
@@ -17,11 +18,19 @@ def get_db():
 
 
 @router.get("/{mentee_id}")
-def get_matches(mentee_id: int, db: Session = Depends(get_db)):
-    mentee = db.query(Profile).filter(
-        Profile.id == mentee_id,
-        Profile.role == "mentee"
-    ).first()
+def get_matches(
+    mentee_id: int,
+    db: Session = Depends(get_db)
+):
+    mentee = (
+        db.query(Profile)
+        .join(User)
+        .filter(
+            Profile.id == mentee_id,
+            User.role == "mentee"
+        )
+        .first()
+    )
 
     if not mentee:
         raise HTTPException(
@@ -29,9 +38,12 @@ def get_matches(mentee_id: int, db: Session = Depends(get_db)):
             detail="Mentee profile not found"
         )
 
-    mentors = db.query(Profile).filter(
-        Profile.role == "mentor"
-    ).all()
+    mentors = (
+        db.query(Profile)
+        .join(User)
+        .filter(User.role == "mentor")
+        .all()
+    )
 
     matches = []
 
