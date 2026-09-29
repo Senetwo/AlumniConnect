@@ -34,6 +34,8 @@ model_cache/
 .cache/
 huggingface/
 *.safetensors
+ml_models/
+*.zip
 
 # ChromaDB / local vector database
 chroma_db/
