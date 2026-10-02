@@ -38,20 +38,28 @@ def get_matches(
             detail="Mentee profile not found"
         )
 
-    mentors = (
-        db.query(Profile)
-        .join(User)
-        .filter(User.role == "mentor")
-        .all()
+    candidate_results = (
+        matching_service.retrieve_mentor_candidates(
+            mentee,
+            n_results=5
+        )
     )
 
     matches = []
 
-    for mentor in mentors:
-        similarity = matching_service.similarity(
-            mentee,
-            mentor
+    for candidate in candidate_results:
+        mentor = (
+            db.query(Profile)
+            .join(User)
+            .filter(
+                Profile.id == candidate["mentor_id"],
+                User.role == "mentor"
+            )
+            .first()
         )
+
+        if not mentor:
+            continue
 
         matches.append({
             "id": mentor.id,
@@ -59,13 +67,11 @@ def get_matches(
             "career_path": mentor.career_path,
             "experience": mentor.experience,
             "skills": mentor.skills.split(","),
-            "similarity_score": round(similarity * 100, 2)
+            "similarity_score": round(
+                candidate["similarity"] * 100,
+                2
+            )
         })
-
-    matches.sort(
-        key=lambda x: x["similarity_score"],
-        reverse=True
-    )
 
     return {
         "mentee_id": mentee.id,
