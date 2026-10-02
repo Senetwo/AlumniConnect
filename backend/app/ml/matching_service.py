@@ -1,7 +1,6 @@
-import numpy as np
-
 from app.ml.embedding_service import embedding_service
 from app.ml.profile_text_service import profile_text_service
+from app.ml.vector_store_service import vector_store_service
 
 
 class MatchingService:
@@ -14,7 +13,7 @@ class MatchingService:
         embedding_a = self.create_embedding(profile_a)
         embedding_b = self.create_embedding(profile_b)
 
-        return float(np.dot(embedding_a, embedding_b))
+        return float(embedding_a @ embedding_b)
 
     def rank_matches(self, mentee, mentors):
         matches = []
@@ -37,6 +36,18 @@ class MatchingService:
         )
 
         return matches
+
+    def retrieve_mentor_candidates(
+        self,
+        mentee,
+        n_results: int = 5
+    ):
+        embedding = self.create_embedding(mentee)
+
+        return vector_store_service.search_mentors(
+            embedding,
+            n_results=n_results
+        )
 
 
 matching_service = MatchingService()
