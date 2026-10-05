@@ -12,7 +12,6 @@ import {
   ArrowRight,
   Search,
   SlidersHorizontal,
-  UserRound,
   Plane,
 } from "lucide-react";
 
@@ -342,7 +341,7 @@ function MentorsPage() {
         setLoading(false);
       });
 
-  }, []);
+  }, [menteeId]);
 
 
   if (loading) {
@@ -597,6 +596,9 @@ function LoginPage() {
 ========================= */
 
 function RegisterPage() {
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const [role, setRole] = useState("mentee");
   const [domain, setDomain] = useState("");
@@ -606,81 +608,66 @@ function RegisterPage() {
   const [goals, setGoals] = useState("");
   const [availability, setAvailability] = useState("");
 
-
   const selectedDomain = careerDomains.find(
     (item) => item.id === domain
   );
 
-
   const handleSubmit = async (event) => {
-
     event.preventDefault();
 
-    const profile = {
-
+    const registrationData = {
+      full_name: fullName,
+      email,
+      password,
       role,
-
-      career_domain: domain,
-
-      career_path: career,
-
-      experience,
-
-      skills: skills
-        .split(",")
-        .map((skill) => skill.trim())
-        .filter(Boolean),
-
-      career_goals: goals,
-
-      availability,
-
+      profile: {
+        career_domain: domain,
+        career_path: career,
+        experience,
+        skills: skills
+          .split(",")
+          .map((skill) => skill.trim())
+          .filter(Boolean),
+        certifications: [],
+        career_goals: goals,
+        mentorship_interests: [],
+        availability,
+        bio: null,
+      },
     };
 
-
     try {
-
       const response = await fetch(
-        "http://127.0.0.1:8000/api/profiles/",
+        "http://127.0.0.1:8000/api/auth/register",
         {
           method: "POST",
-
           headers: {
             "Content-Type": "application/json",
           },
-
-          body: JSON.stringify(profile),
+          body: JSON.stringify(registrationData),
         }
       );
 
-
       if (!response.ok) {
-        throw new Error("Failed to create profile");
+        const errorData = await response.json();
+
+        throw new Error(
+          errorData.detail || "Registration failed"
+        );
       }
 
+      await response.json();
 
-      const savedProfile = await response.json();
-
-      console.log("Profile saved:", savedProfile);
-
-
-      window.location.href = `/mentors?mentee=${savedProfile.id}`;
-
+      window.location.href = "/login";
     } catch (error) {
-
-      console.error(
-        "Profile creation failed:",
-        error
-      );
+      console.error("Registration failed:", error);
 
       alert(
-        "We couldn't save your profile. Please make sure the AlumniConnect backend is running."
+        error.message ||
+          "We couldn't create your account. Please make sure the AlumniConnect backend is running."
       );
-
     }
-
   };
-
 
   return (
 
@@ -726,6 +713,52 @@ function RegisterPage() {
           className="profile-form"
           onSubmit={handleSubmit}
         >
+
+        <section className="form-section">
+  <div className="form-section-heading">
+    <span>01</span>
+    <div>
+      <h2>Your account</h2>
+      <p>Create your AlumniConnect account.</p>
+    </div>
+  </div>
+
+  <div className="form-grid">
+    <div className="field">
+      <label>Full name</label>
+      <input
+        type="text"
+        value={fullName}
+        onChange={(event) => setFullName(event.target.value)}
+        placeholder="e.g. Joy Senetwo"
+        required
+      />
+    </div>
+
+    <div className="field">
+      <label>Email address</label>
+      <input
+        type="email"
+        value={email}
+        onChange={(event) => setEmail(event.target.value)}
+        placeholder="you@example.com"
+        required
+      />
+    </div>
+
+    <div className="field">
+      <label>Password</label>
+      <input
+        type="password"
+        value={password}
+        onChange={(event) => setPassword(event.target.value)}
+        placeholder="At least 8 characters"
+        minLength="8"
+        required
+      />
+    </div>
+  </div>
+</section>
 
 
           {/* ROLE */}
