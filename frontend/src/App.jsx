@@ -555,13 +555,77 @@ function MentorsPage() {
 ========================= */
 
 function LoginPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleLogin = async (event) => {
+    event.preventDefault();
+
+    setError("");
+    setLoading(true);
+
+    try {
+      const response = await fetch(
+        "http://127.0.0.1:8000/api/auth/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            password,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || "Invalid email or password");
+      }
+
+      const token = data.access_token;
+
+      const meResponse = await fetch(
+        "http://127.0.0.1:8000/api/auth/me",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const userData = await meResponse.json();
+
+      if (!meResponse.ok) {
+        throw new Error(
+          userData.detail || "Unable to retrieve your account information"
+        );
+      }
+
+      sessionStorage.setItem("alumniconnect_token", token);
+      sessionStorage.setItem(
+        "alumniconnect_user",
+        JSON.stringify(userData)
+      );
+
+      window.location.href = "/mentors";
+    } catch (error) {
+      setError(
+        error.message ||
+          "We couldn't sign you in. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-
     <div className="simple-page">
-
       <div className="simple-card">
-
         <Link to="/" className="brand">
           <span className="brand-mark">A</span>
           <span>AlumniConnect</span>
@@ -573,23 +637,43 @@ function LoginPage() {
           Sign in to your AlumniConnect account.
         </p>
 
-        <input placeholder="Email address" />
+        <form onSubmit={handleLogin}>
+          <input
+            type="email"
+            placeholder="Email address"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            autoComplete="email"
+            required
+          />
 
-        <input
-          type="password"
-          placeholder="Password"
-        />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            autoComplete="current-password"
+            required
+          />
 
-        <button className="btn btn-primary btn-full">
-          Sign in
-        </button>
+          {error && (
+            <p className="form-error" role="alert">
+              {error}
+            </p>
+          )}
 
+          <button
+            type="submit"
+            className="btn btn-primary btn-full"
+            disabled={loading}
+          >
+            {loading ? "Signing in..." : "Sign in"}
+          </button>
+        </form>
       </div>
-
     </div>
   );
 }
-
 
 /* =========================
    REGISTER
