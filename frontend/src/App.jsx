@@ -13,6 +13,8 @@ import {
   Search,
   SlidersHorizontal,
   Plane,
+  Menu,
+  X,
 } from "lucide-react";
 
 import { careerDomains } from "./data/careers";
@@ -21,29 +23,202 @@ import { careerDomains } from "./data/careers";
    NAVBAR
 ========================= */
 
+function ProtectedRoute({ children, allowedRoles }) {
+  const token = sessionStorage.getItem("alumniconnect_token");
+  const storedUser = sessionStorage.getItem("alumniconnect_user");
+
+  if (!token || !storedUser) {
+    return <Navigate to="/login" replace />;
+  }
+
+  let user;
+
+  try {
+    user = JSON.parse(storedUser);
+  } catch {
+    sessionStorage.removeItem("alumniconnect_token");
+    sessionStorage.removeItem("alumniconnect_user");
+    return <Navigate to="/login" replace />;
+  }
+
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+}
+
 function Navbar() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const token = sessionStorage.getItem("alumniconnect_token");
+  const storedUser = sessionStorage.getItem("alumniconnect_user");
+
+  let user;
+
+  try {
+    user = storedUser ? JSON.parse(storedUser) : null;
+  } catch {
+    user = null;
+  }
+
+  const isAuthenticated = Boolean(token && user);
+  const isMentor = user?.role === "mentor";
+  const isMentee = user?.role === "mentee";
+
+  const handleLogout = () => {
+    sessionStorage.removeItem("alumniconnect_token");
+    sessionStorage.removeItem("alumniconnect_user");
+    setMenuOpen(false);
+    window.location.href = "/";
+  };
+
+  const closeMenu = () => {
+    setMenuOpen(false);
+  };
+
   return (
     <header className="navbar">
-      <Link to="/" className="brand">
+      <Link to="/" className="brand" onClick={closeMenu}>
         <span className="brand-mark">A</span>
         <span>Kenya Airways AlumniConnect</span>
       </Link>
 
       <nav className="nav-links">
-        <Link to="/">Home</Link>
-        <Link to="/mentors">Discover Mentors</Link>
-        <Link to="/knowledge">Knowledge Hub</Link>
+        <Link to="/" onClick={closeMenu}>Home</Link>
+
+        {isAuthenticated && isMentee && (
+          <Link to="/mentors" onClick={closeMenu}>
+            Discover Mentors
+          </Link>
+        )}
+
+        {isAuthenticated && isMentor && (
+          <Link to="/mentor-workspace" onClick={closeMenu}>
+            My Workspace
+          </Link>
+        )}
+
+        <Link to="/knowledge" onClick={closeMenu}>
+          Knowledge Hub
+        </Link>
+
+        {isAuthenticated && (
+          <>
+            <Link to="/notifications" onClick={closeMenu}>
+              Notifications
+            </Link>
+
+            <Link to="/chats" onClick={closeMenu}>
+              Chats
+            </Link>
+
+            <Link to="/profile" onClick={closeMenu}>
+              My Profile
+            </Link>
+          </>
+        )}
       </nav>
 
       <div className="nav-actions">
-        <Link to="/login" className="btn btn-outline">
-          Log in
-        </Link>
+        {!isAuthenticated ? (
+          <>
+            <Link to="/login" className="btn btn-outline">
+              Log in
+            </Link>
 
-        <Link to="/register" className="btn btn-primary">
-          Get started
-        </Link>
+            <Link to="/register" className="btn btn-primary">
+              Get started
+            </Link>
+          </>
+        ) : (
+          <button
+            type="button"
+            className="btn btn-outline"
+            onClick={handleLogout}
+          >
+            Log out
+          </button>
+        )}
       </div>
+
+      <button
+        type="button"
+        className="mobile-menu-button"
+        onClick={() => setMenuOpen(!menuOpen)}
+        aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
+        aria-expanded={menuOpen}
+      >
+        {menuOpen ? <X size={22} /> : <Menu size={22} />}
+      </button>
+
+      {menuOpen && (
+        <div className="mobile-nav">
+          <Link to="/" onClick={closeMenu}>
+            Home
+          </Link>
+
+          {isAuthenticated && isMentee && (
+            <Link to="/mentors" onClick={closeMenu}>
+              Discover Mentors
+            </Link>
+          )}
+
+          {isAuthenticated && isMentor && (
+            <Link to="/mentor-workspace" onClick={closeMenu}>
+              My Workspace
+            </Link>
+          )}
+
+          <Link to="/knowledge" onClick={closeMenu}>
+            Knowledge Hub
+          </Link>
+
+          {isAuthenticated && (
+            <>
+              <Link to="/notifications" onClick={closeMenu}>
+                Notifications
+              </Link>
+
+              <Link to="/chats" onClick={closeMenu}>
+                Chats
+              </Link>
+
+              <Link to="/profile" onClick={closeMenu}>
+                My Profile
+              </Link>
+
+              <button
+                type="button"
+                className="mobile-nav-logout"
+                onClick={handleLogout}
+              >
+                Log out
+              </button>
+            </>
+          )}
+
+          {!isAuthenticated && (
+            <div className="mobile-nav-actions">
+              <Link
+                to="/login"
+                className="btn btn-outline"
+                onClick={closeMenu}
+              >
+                Log in
+              </Link>
+
+              <Link
+                to="/register"
+                className="btn btn-primary"
+                onClick={closeMenu}
+              >
+                Get started
+              </Link>
+            </div>
+          )}
+        </div>
+      )}
     </header>
   );
 }
@@ -313,35 +488,42 @@ function MentorsPage() {
 
   const [mentors, setMentors] = useState([]);
   const [loading, setLoading] = useState(true);
-  const params = new URLSearchParams(window.location.search);
-  const menteeId = params.get("mentee") || "1";
+  const [error, setError] = useState("");
 
   useEffect(() => {
+    const token = sessionStorage.getItem("alumniconnect_token");
 
-    fetch(`http://127.0.0.1:8000/api/matches/${menteeId}`)
+    if (!token) {
+      window.location.href = "/login";
+      return;
+    }
 
-      .then((response) => {
+    fetch("http://127.0.0.1:8000/api/matches/me", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then(async (response) => {
+        const data = await response.json();
 
         if (!response.ok) {
-          throw new Error("Failed to fetch mentor matches");
+          throw new Error(
+            data.detail || "Failed to fetch mentor matches"
+          );
         }
 
-        return response.json();
+        return data;
       })
-
       .then((data) => {
         setMentors(data.matches);
       })
-
       .catch((error) => {
-        console.error("Failed to load mentors:", error);
+        setError(error.message);
       })
-
       .finally(() => {
         setLoading(false);
       });
-
-  }, [menteeId]);
+  }, []);
 
 
   if (loading) {
@@ -360,6 +542,23 @@ function MentorsPage() {
     );
   }
 
+if (error) {
+  return (
+    <div className="simple-page">
+      <div className="simple-card">
+        <h1>Unable to load mentors</h1>
+
+        <p>
+          {error}
+        </p>
+
+        <Link to="/login" className="btn btn-primary">
+          Return to login
+        </Link>
+      </div>
+    </div>
+  );
+}
 
   return (
     <div className="app">
@@ -1261,52 +1460,104 @@ function App() {
 
       <Routes>
 
-        <Route
-          path="/"
-          element={<LandingPage />}
-        />
+  {/* PUBLIC ROUTES */}
 
-        <Route
-          path="/mentors"
-          element={<MentorsPage />}
-        />
+  <Route
+    path="/"
+    element={<LandingPage />}
+  />
 
-        <Route
-          path="/login"
-          element={<LoginPage />}
-        />
+  <Route
+    path="/login"
+    element={<LoginPage />}
+  />
 
-        <Route
-          path="/register"
-          element={<RegisterPage />}
-        />
+  <Route
+    path="/register"
+    element={<RegisterPage />}
+  />
 
-        <Route
-          path="/knowledge"
-          element={<Placeholder title="Knowledge Hub" />}
-        />
+  <Route
+    path="/knowledge"
+    element={<Placeholder title="Knowledge Hub" />}
+  />
 
-        <Route
-          path="/mentor"
-          element={<Placeholder title="Mentor Workspace" />}
-        />
 
-        <Route
-          path="/admin"
-          element={<Placeholder title="Administrator Dashboard" />}
-        />
+  {/* MENTEE-ONLY ROUTES */}
 
-        <Route
-          path="/mentor-profile"
-          element={<Placeholder title="Mentor Profile" />}
-        />
+  <Route
+    path="/mentors"
+    element={
+      <ProtectedRoute allowedRoles={["mentee"]}>
+        <MentorsPage />
+      </ProtectedRoute>
+    }
+  />
 
-        <Route
-          path="*"
-          element={<Navigate to="/" replace />}
-        />
 
-      </Routes>
+  {/* MENTOR-ONLY ROUTES */}
+
+  <Route
+    path="/mentor-workspace"
+    element={
+      <ProtectedRoute allowedRoles={["mentor"]}>
+        <Placeholder title="Mentor Workspace" />
+      </ProtectedRoute>
+    }
+  />
+
+
+  {/* SHARED AUTHENTICATED ROUTES */}
+
+  <Route
+    path="/profile"
+    element={
+      <ProtectedRoute allowedRoles={["mentor", "mentee"]}>
+        <Placeholder title="My Profile" />
+      </ProtectedRoute>
+    }
+  />
+
+  <Route
+    path="/notifications"
+    element={
+      <ProtectedRoute allowedRoles={["mentor", "mentee"]}>
+        <Placeholder title="Notifications" />
+      </ProtectedRoute>
+    }
+  />
+
+  <Route
+    path="/chats"
+    element={
+      <ProtectedRoute allowedRoles={["mentor", "mentee"]}>
+        <Placeholder title="Chats" />
+      </ProtectedRoute>
+    }
+  />
+
+
+  {/* EXISTING PLACEHOLDER */}
+
+  <Route
+    path="/admin"
+    element={<Placeholder title="Administrator Dashboard" />}
+  />
+
+  <Route
+    path="/mentor-profile"
+    element={<Placeholder title="Mentor Profile" />}
+  />
+
+
+  {/* FALLBACK */}
+
+  <Route
+    path="*"
+    element={<Navigate to="/" replace />}
+  />
+
+</Routes>
 
     </BrowserRouter>
   );
