@@ -1,1567 +1,213 @@
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  Link,
-  Navigate,
-} from "react-router-dom";
-
-import { useEffect, useState } from "react";
-
-import {
-  ArrowRight,
-  Search,
-  SlidersHorizontal,
-  Plane,
-  Menu,
-  X,
-} from "lucide-react";
-
-import { careerDomains } from "./data/careers";
-
-/* =========================
-   NAVBAR
-========================= */
-
-function ProtectedRoute({ children, allowedRoles }) {
-  const token = sessionStorage.getItem("alumniconnect_token");
-  const storedUser = sessionStorage.getItem("alumniconnect_user");
-
-  if (!token || !storedUser) {
-    return <Navigate to="/login" replace />;
-  }
-
-  let user;
-
-  try {
-    user = JSON.parse(storedUser);
-  } catch {
-    sessionStorage.removeItem("alumniconnect_token");
-    sessionStorage.removeItem("alumniconnect_user");
-    return <Navigate to="/login" replace />;
-  }
-
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/" replace />;
-  }
-
-  return children;
-}
-
-function Navbar() {
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  const token = sessionStorage.getItem("alumniconnect_token");
-  const storedUser = sessionStorage.getItem("alumniconnect_user");
-
-  let user;
-
-  try {
-    user = storedUser ? JSON.parse(storedUser) : null;
-  } catch {
-    user = null;
-  }
-
-  const isAuthenticated = Boolean(token && user);
-  const isMentor = user?.role === "mentor";
-  const isMentee = user?.role === "mentee";
-
-  const handleLogout = () => {
-    sessionStorage.removeItem("alumniconnect_token");
-    sessionStorage.removeItem("alumniconnect_user");
-    setMenuOpen(false);
-    window.location.href = "/";
-  };
-
-  const closeMenu = () => {
-    setMenuOpen(false);
-  };
-
-  return (
-    <header className="navbar">
-      <Link to="/" className="brand" onClick={closeMenu}>
-        <span className="brand-mark">A</span>
-        <span>Kenya Airways AlumniConnect</span>
-      </Link>
-
-      <nav className="nav-links">
-        <Link to="/" onClick={closeMenu}>Home</Link>
-
-        {isAuthenticated && isMentee && (
-          <Link to="/mentors" onClick={closeMenu}>
-            Discover Mentors
-          </Link>
-        )}
-
-        {isAuthenticated && isMentor && (
-          <Link to="/mentor-workspace" onClick={closeMenu}>
-            My Workspace
-          </Link>
-        )}
-
-        <Link to="/knowledge" onClick={closeMenu}>
-          Knowledge Hub
-        </Link>
-
-        {isAuthenticated && (
-          <>
-            <Link to="/notifications" onClick={closeMenu}>
-              Notifications
-            </Link>
-
-            <Link to="/chats" onClick={closeMenu}>
-              Chats
-            </Link>
-
-            <Link to="/profile" onClick={closeMenu}>
-              My Profile
-            </Link>
-          </>
-        )}
-      </nav>
-
-      <div className="nav-actions">
-        {!isAuthenticated ? (
-          <>
-            <Link to="/login" className="btn btn-outline">
-              Log in
-            </Link>
-
-            <Link to="/register" className="btn btn-primary">
-              Get started
-            </Link>
-          </>
-        ) : (
-          <button
-            type="button"
-            className="btn btn-outline"
-            onClick={handleLogout}
-          >
-            Log out
-          </button>
-        )}
-      </div>
-
-      <button
-        type="button"
-        className="mobile-menu-button"
-        onClick={() => setMenuOpen(!menuOpen)}
-        aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
-        aria-expanded={menuOpen}
-      >
-        {menuOpen ? <X size={22} /> : <Menu size={22} />}
-      </button>
-
-      {menuOpen && (
-        <div className="mobile-nav">
-          <Link to="/" onClick={closeMenu}>
-            Home
-          </Link>
-
-          {isAuthenticated && isMentee && (
-            <Link to="/mentors" onClick={closeMenu}>
-              Discover Mentors
-            </Link>
-          )}
-
-          {isAuthenticated && isMentor && (
-            <Link to="/mentor-workspace" onClick={closeMenu}>
-              My Workspace
-            </Link>
-          )}
-
-          <Link to="/knowledge" onClick={closeMenu}>
-            Knowledge Hub
-          </Link>
-
-          {isAuthenticated && (
-            <>
-              <Link to="/notifications" onClick={closeMenu}>
-                Notifications
-              </Link>
-
-              <Link to="/chats" onClick={closeMenu}>
-                Chats
-              </Link>
-
-              <Link to="/profile" onClick={closeMenu}>
-                My Profile
-              </Link>
-
-              <button
-                type="button"
-                className="mobile-nav-logout"
-                onClick={handleLogout}
-              >
-                Log out
-              </button>
-            </>
-          )}
-
-          {!isAuthenticated && (
-            <div className="mobile-nav-actions">
-              <Link
-                to="/login"
-                className="btn btn-outline"
-                onClick={closeMenu}
-              >
-                Log in
-              </Link>
-
-              <Link
-                to="/register"
-                className="btn btn-primary"
-                onClick={closeMenu}
-              >
-                Get started
-              </Link>
-            </div>
-          )}
-        </div>
-      )}
-    </header>
-  );
-}
-
-/* =========================
-   LANDING PAGE
-========================= */
-
-function LandingPage() {
-  return (
-    <div className="app">
-      <Navbar />
-
-      <main>
-
-        {/* HERO */}
-
-        <section className="landing-hero">
-
-          <div className="hero-content">
-
-            <span className="eyebrow">
-              KENYA AIRWAYS • ALUMNI • MENTORSHIP
-            </span>
-
-            <h1>
-              Connect experience
-              <br />
-              with ambition.
-            </h1>
-
-            <p>
-              Kenya Airways AlumniConnect creates meaningful professional
-              connections between experienced alumni, aviation professionals
-              and the next generation of talent.
-            </p>
-
-            <div className="hero-buttons">
-              <Link to="/mentors" className="btn btn-primary btn-large">
-                Find a mentor
-                <ArrowRight size={17} />
-              </Link>
-
-              <Link to="/register" className="btn btn-outline btn-large">
-                Become a mentor
-              </Link>
-            </div>
-
-          </div>
-
-          <div className="hero-side">
-
-            <div className="hero-card">
-
-              <div className="hero-card-label">
-                SEMANTIC MENTOR MATCH
-              </div>
-
-              <div className="hero-match">
-
-                <div className="mentor-avatar">
-                  AM
-                </div>
-
-                <div>
-                  <h3>Recommended Mentor</h3>
-                  <p>Technology & Digital</p>
-                </div>
-
-                <strong>92%</strong>
-
-              </div>
-
-              <div className="match-bar">
-                <div />
-              </div>
-
-              <p className="match-text">
-                Matched across skills, experience, career interests and
-                professional goals.
-              </p>
-
-            </div>
-
-            <div className="hero-stat-row">
-
-              <div>
-                <strong>Semantic</strong>
-                <span>Profile matching</span>
-              </div>
-
-              <div>
-                <strong>Career</strong>
-                <span>Development</span>
-              </div>
-
-              <div>
-                <strong>Knowledge</strong>
-                <span>Sharing</span>
-              </div>
-
-            </div>
-
-          </div>
-
-        </section>
-
-
-        {/* HOW IT WORKS */}
-
-        <section className="process-section">
-
-          <div className="section-intro">
-            <span className="section-number">01</span>
-
-            <div>
-              <h2>How AlumniConnect works</h2>
-
-              <p>
-                A structured mentorship journey built around professional
-                goals and meaningful experience.
-              </p>
-            </div>
-          </div>
-
-
-          <div className="process-grid">
-
-            <div className="process-card">
-              <span>01</span>
-              <h3>Create your profile</h3>
-
-              <p>
-                Build a professional profile containing your experience,
-                skills and career interests.
-              </p>
-            </div>
-
-            <div className="process-card">
-              <span>02</span>
-              <h3>Define your goals</h3>
-
-              <p>
-                Tell the platform where you want your career to go and the
-                experience you are looking for.
-              </p>
-            </div>
-
-            <div className="process-card featured">
-              <span>03</span>
-              <h3>Semantic matching</h3>
-
-              <p>
-                Sentence-BERT analyses profile information to identify
-                meaningful mentor compatibility.
-              </p>
-            </div>
-
-            <div className="process-card">
-              <span>04</span>
-              <h3>Connect & engage</h3>
-
-              <p>
-                Review recommendations, understand the match and request
-                mentorship.
-              </p>
-            </div>
-
-          </div>
-
-        </section>
-
-
-        {/* CAREER AREAS */}
-
-        <section className="career-section">
-
-          <div className="section-intro">
-
-            <span className="section-number">02</span>
-
-            <div>
-              <h2>Explore career pathways</h2>
-
-              <p>
-                Discover professional directions across the aviation
-                ecosystem.
-              </p>
-            </div>
-
-          </div>
-
-
-          <div className="career-grid">
-
-            {careerDomains.map((domain) => (
-
-              <div className="career-card" key={domain.id}>
-
-                <div className="career-card-top">
-                  <h3>{domain.name}</h3>
-                  <ArrowRight size={16} />
-                </div>
-
-                <div className="career-tags">
-
-                  {domain.careers.slice(0, 4).map((career) => (
-                    <span key={career}>{career}</span>
-                  ))}
-
-                </div>
-
-              </div>
-
-            ))}
-
-          </div>
-
-        </section>
-
-
-        {/* CTA */}
-
-        <section className="landing-cta">
-
-          <Plane size={24} />
-
-          <h2>
-            Your experience can
-            <br />
-            shape someone's next chapter.
-          </h2>
-
-          <Link to="/register" className="btn btn-light btn-large">
-            Join AlumniConnect
-            <ArrowRight size={17} />
-          </Link>
-
-        </section>
-
-      </main>
-
-
-      <footer>
-
-        <div className="brand">
-          <span className="brand-mark">A</span>
-          <span>Kenya Airways AlumniConnect</span>
-        </div>
-
-        <span>Professional mentorship & knowledge sharing</span>
-
-        <span>© 2026</span>
-
-      </footer>
-
-    </div>
-  );
-}
-
-
-/* =========================
-   DISCOVER MENTORS
-========================= */
-
-function MentorsPage() {
-
-  const [mentors, setMentors] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useAuth, useClerk, HandleSSOCallback } from "@clerk/react";
+import ProtectedRoute from "./components/ProtectedRoute";
+import SiteFooter from "./components/SiteFooter";
+import NotificationsPage from "./pages/NotificationsPage";
+import LandingPage from "./pages/LandingPage";
+import MentorsPage from "./pages/MentorsPage";
+import RegisterPage from "./pages/RegisterPage";
+import LoginPage from "./pages/LoginPage";
+import MyProfilePage from "./pages/MyProfilePage";
+import MentorWorkspacePage from "./pages/MentorWorkspacePage";
+import MyMentorshipsPage from "./pages/MyMentorshipsPage";
+import AvailabilityPage from "./pages/AvailabilityPage";
+import BookingPage from "./pages/BookingPage";
+import ChatsPage from "./pages/ChatsPage";
+import KnowledgePage from "./pages/KnowledgePage";
+import AdminKnowledgePage from "./pages/AdminKnowledgePage";
+import AdminDashboard from "./pages/AdminDashboard";
+import MentorProfilePage from "./pages/MentorProfilePage";
+import DirectoryPage from "./pages/DirectoryPage";
+import AdminAnnouncementsPage from "./pages/AdminAnnouncementsPage";
+import AdminCommunityPage from "./pages/AdminCommunityPage";
+import AdminUsersPage from "./pages/AdminUsersPage";
+import AdminOperationsPage from "./pages/AdminOperationsPage";
+import VerifyEmailPage from "./pages/VerifyEmailPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
+import { apiRequest } from "./services/api";
+import { clearAuth, getAuth, saveClerkAuth, saveAuth, setClerkSession } from "./services/authStorage";
+import ClerkOnboardingPage from "./pages/ClerkOnboardingPage";
+
+function SessionRoleSync() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const syncedToken = useRef(null);
+  const inFlightToken = useRef(null);
 
   useEffect(() => {
-    const token = sessionStorage.getItem("alumniconnect_token");
+    const auth = getAuth();
+    if (!auth || syncedToken.current === auth.token || inFlightToken.current === auth.token) return;
+    inFlightToken.current = auth.token;
+    apiRequest("/api/auth/me").then(user => {
+      inFlightToken.current = null;
+      if (getAuth()?.token !== auth.token) return;
+      syncedToken.current = auth.token;
+      const roleChanged = user.role !== auth.user.role;
+      saveAuth(auth.token, user, auth.storage === localStorage);
+      if (roleChanged) {
+        const home = user.role === "admin" ? "/admin" : user.role === "mentor" ? "/mentor-workspace" : "/mentors";
+        navigate(home, { replace: true });
+      } else {
+        navigate(`${location.pathname}${location.search}`, { replace: true });
+      }
+    }).catch(error => {
+      inFlightToken.current = null;
+      if (getAuth()?.token !== auth.token) return;
+      if (error.message?.includes("session may have expired")) {
+        clearAuth();
+        navigate("/login", { replace: true });
+      }
+    });
+  }, [location.pathname, location.search, navigate]);
 
-    if (!token) {
-      window.location.href = "/login";
+  return null;
+}
+
+function ClerkSessionBridge() {
+  const { isLoaded, isSignedIn, getToken } = useAuth();
+  const clerk = useClerk();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    setClerkSession(getToken, () => clerk.signOut());
+    return () => setClerkSession(null, null);
+  }, [getToken, clerk]);
+
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn) return;
+    // Keep the login and registration screens available even if Clerk has a
+    // cached session. The user may be switching accounts or using password
+    // sign-in, so only sync Clerk on application routes / the callback flow.
+    if (["/login", "/register", "/auth/complete", "/clerk-onboarding"].includes(location.pathname)) return;
+    const savedAuth = getAuth();
+    // A password sign-in may coexist with a Clerk browser session. Do not let
+    // the background bridge replace the explicitly selected AlumniConnect
+    // account with the cached Clerk identity.
+    if (savedAuth && !savedAuth.clerk) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const token = await getToken();
+        const user = await apiRequest("/api/auth/clerk/session", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (cancelled) return;
+        saveClerkAuth(token, user);
+      } catch (error) {
+        if (cancelled) return;
+        if (error.message?.includes("Complete AlumniConnect account setup")) {
+          navigate("/clerk-onboarding", { replace: true });
+        }
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [isLoaded, isSignedIn, getToken, location.pathname, navigate]);
+
+  return null;
+}
+
+function ClerkAuthComplete() {
+  const { isLoaded, isSignedIn, getToken } = useAuth();
+  const navigate = useNavigate();
+  const [error, setError] = useState("");
+  const [attempt, setAttempt] = useState(0);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+    if (!isSignedIn) {
+      navigate("/login", { replace: true });
       return;
     }
 
-    fetch("http://127.0.0.1:8000/api/matches/me", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then(async (response) => {
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(
-            data.detail || "Failed to fetch mentor matches"
-          );
+    let cancelled = false;
+    (async () => {
+      try {
+        const token = await getToken();
+        const user = await apiRequest("/api/auth/clerk/session", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (cancelled) return;
+        saveClerkAuth(token, user);
+        const destination = user.role === "admin" ? "/admin" : user.role === "mentor" ? "/mentor-workspace" : "/mentors";
+        navigate(destination, { replace: true });
+      } catch (sessionError) {
+        if (cancelled) return;
+        if (sessionError.message?.includes("Complete AlumniConnect account setup")) {
+          navigate("/clerk-onboarding", { replace: true });
+        } else {
+          setError(sessionError.message || "Unable to finish signing in. Please try again.");
         }
-
-        return data;
-      })
-      .then((data) => {
-        setMentors(data.matches);
-      })
-      .catch((error) => {
-        setError(error.message);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
-
-
-  if (loading) {
-    return (
-      <div className="simple-page">
-        <div className="simple-card">
-
-          <h1>Finding your mentors...</h1>
-
-          <p>
-            Analysing your profile using semantic matching.
-          </p>
-
-        </div>
-      </div>
-    );
-  }
-
-if (error) {
-  return (
-    <div className="simple-page">
-      <div className="simple-card">
-        <h1>Unable to load mentors</h1>
-
-        <p>
-          {error}
-        </p>
-
-        <Link to="/login" className="btn btn-primary">
-          Return to login
-        </Link>
-      </div>
-    </div>
-  );
-}
-
-  return (
-    <div className="app">
-
-      <Navbar />
-
-      <main className="mentors-page">
-
-        <div className="mentors-header">
-
-          <div>
-
-            <span className="eyebrow">
-              SEMANTIC MENTOR DISCOVERY
-            </span>
-
-            <h1>Recommended Mentors</h1>
-
-            <p>
-              Discover mentors whose experience and competencies align with
-              your career goals.
-            </p>
-
-          </div>
-
-        </div>
-
-
-        {/* FILTERS */}
-
-        <div className="mentor-filters">
-
-          <div className="search-box">
-            <Search size={17} />
-            <input placeholder="Search keywords..." />
-          </div>
-
-          <select>
-            <option>Aviation discipline</option>
-
-            {careerDomains.map((domain) => (
-              <option key={domain.id}>
-                {domain.name}
-              </option>
-            ))}
-
-          </select>
-
-          <select>
-            <option>Required competency</option>
-            <option>Leadership</option>
-            <option>Technical</option>
-            <option>Communication</option>
-            <option>Management</option>
-          </select>
-
-          <button className="filter-button">
-            <SlidersHorizontal size={16} />
-            Filters
-          </button>
-
-        </div>
-
-
-        {/* RESULTS */}
-
-        <div className="mentor-results">
-
-          {mentors.map((mentor) => {
-
-            const initials = mentor.career_path
-              .split(" ")
-              .map((word) => word[0])
-              .join("")
-              .slice(0, 2)
-              .toUpperCase();
-
-            return (
-
-              <div
-                className="mentor-result-card"
-                key={mentor.id}
-              >
-
-                <div className="mentor-card-header">
-
-                  <div className="mentor-identity">
-
-                    <div className="mentor-avatar large">
-                      {initials}
-                    </div>
-
-                    <div>
-
-                      <h3>{mentor.career_path}</h3>
-
-                      <p>
-                        {mentor.career_domain}
-                      </p>
-
-                    </div>
-
-                  </div>
-
-
-                  <div className="cosine-score">
-
-                    <strong>
-                      {mentor.similarity_score}%
-                    </strong>
-
-                    <span>
-                      COSINE MATCH
-                    </span>
-
-                  </div>
-
-                </div>
-
-
-                <div className="mentor-meta">
-
-                  <span>
-                    {mentor.experience}
-                  </span>
-
-                  <span>
-                    {mentor.availability}
-                  </span>
-
-                </div>
-
-
-                <div className="rationale">
-
-                  <strong>
-                    Sentence-BERT similarity rationale
-                  </strong>
-
-                  <p>
-                    Semantic similarity was calculated from career direction,
-                    skills, experience, availability and professional goals.
-                  </p>
-
-                </div>
-
-
-                <div className="competencies">
-
-                  {mentor.skills.map((skill) => (
-
-                    <span key={skill.trim()}>
-                      {skill.trim()}
-                    </span>
-
-                  ))}
-
-                </div>
-
-
-                <div className="mentor-card-actions">
-
-                  <Link
-                    to="/mentor-profile"
-                    className="btn btn-outline"
-                  >
-                    View Profile
-                  </Link>
-
-                  <button className="btn btn-primary">
-                    Request Mentorship
-                  </button>
-
-                </div>
-
-              </div>
-
-            );
-
-          })}
-
-        </div>
-
-      </main>
-
-    </div>
-  );
-}
-
-
-/* =========================
-   LOGIN
-========================= */
-
-function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  const handleLogin = async (event) => {
-    event.preventDefault();
-
-    setError("");
-    setLoading(true);
-
-    try {
-      const response = await fetch(
-        "http://127.0.0.1:8000/api/auth/login",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email,
-            password,
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.detail || "Invalid email or password");
       }
+    })();
+    return () => { cancelled = true; };
+  }, [isLoaded, isSignedIn, getToken, navigate, attempt]);
 
-      const token = data.access_token;
-
-      const meResponse = await fetch(
-        "http://127.0.0.1:8000/api/auth/me",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      const userData = await meResponse.json();
-
-      if (!meResponse.ok) {
-        throw new Error(
-          userData.detail || "Unable to retrieve your account information"
-        );
-      }
-
-      sessionStorage.setItem("alumniconnect_token", token);
-      sessionStorage.setItem(
-        "alumniconnect_user",
-        JSON.stringify(userData)
-      );
-
-      window.location.href = "/mentors";
-    } catch (error) {
-      setError(
-        error.message ||
-          "We couldn't sign you in. Please try again."
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="simple-page">
-      <div className="simple-card">
-        <Link to="/" className="brand">
-          <span className="brand-mark">A</span>
-          <span>AlumniConnect</span>
-        </Link>
-
-        <h1>Welcome back.</h1>
-
-        <p>
-          Sign in to your AlumniConnect account.
-        </p>
-
-        <form onSubmit={handleLogin}>
-          <input
-            type="email"
-            placeholder="Email address"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            autoComplete="email"
-            required
-          />
-
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            autoComplete="current-password"
-            required
-          />
-
-          {error && (
-            <p className="form-error" role="alert">
-              {error}
-            </p>
-          )}
-
-          <button
-            type="submit"
-            className="btn btn-primary btn-full"
-            disabled={loading}
-          >
-            {loading ? "Signing in..." : "Sign in"}
-          </button>
-        </form>
-      </div>
-    </div>
-  );
+  return <main className="auth-page" aria-live="polite">
+    <section className="auth-panel">
+      <p role="status">{error ? "We couldn't finish signing you in." : "Finishing sign-in…"}</p>
+      {error && <>
+        <p className="auth-error" role="alert">{error}</p>
+        <button className="btn btn-primary" type="button" onClick={() => { setError(""); setAttempt((value) => value + 1); }}>Try again</button>
+      </>}
+    </section>
+  </main>;
 }
 
-/* =========================
-   REGISTER
-========================= */
-
-function RegisterPage() {
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  const [role, setRole] = useState("mentee");
-  const [domain, setDomain] = useState("");
-  const [career, setCareer] = useState("");
-  const [experience, setExperience] = useState("");
-  const [skills, setSkills] = useState("");
-  const [goals, setGoals] = useState("");
-  const [availability, setAvailability] = useState("");
-
-  const selectedDomain = careerDomains.find(
-    (item) => item.id === domain
-  );
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
-    const registrationData = {
-      full_name: fullName,
-      email,
-      password,
-      role,
-      profile: {
-        career_domain: domain,
-        career_path: career,
-        experience,
-        skills: skills
-          .split(",")
-          .map((skill) => skill.trim())
-          .filter(Boolean),
-        certifications: [],
-        career_goals: goals,
-        mentorship_interests: [],
-        availability,
-        bio: null,
-      },
-    };
-
-    try {
-      const response = await fetch(
-        "http://127.0.0.1:8000/api/auth/register",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(registrationData),
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-
-        throw new Error(
-          errorData.detail || "Registration failed"
-        );
-      }
-
-      await response.json();
-
-      window.location.href = "/login";
-    } catch (error) {
-      console.error("Registration failed:", error);
-
-      alert(
-        error.message ||
-          "We couldn't create your account. Please make sure the AlumniConnect backend is running."
-      );
-    }
-  };
-
-  return (
-
-    <div className="profile-page">
-
-      <div className="profile-container">
-
-        <div className="profile-header">
-
-          <Link to="/" className="brand">
-            <span className="brand-mark">A</span>
-            <span>Kenya Airways AlumniConnect</span>
-          </Link>
-
-          <span className="profile-step">
-            PROFILE SETUP • 01 / 01
-          </span>
-
-        </div>
-
-
-        <div className="profile-intro">
-
-          <span className="eyebrow">
-            BUILD YOUR PROFESSIONAL PROFILE
-          </span>
-
-          <h1>
-            Tell us where
-            <br />
-            you're headed.
-          </h1>
-
-          <p>
-            Your profile helps AlumniConnect identify mentors whose
-            experience, competencies and career direction align with yours.
-          </p>
-
-        </div>
-
-
-        <form
-          className="profile-form"
-          onSubmit={handleSubmit}
-        >
-
-        <section className="form-section">
-  <div className="form-section-heading">
-    <span>01</span>
-    <div>
-      <h2>Your account</h2>
-      <p>Create your AlumniConnect account.</p>
-    </div>
-  </div>
-
-  <div className="form-grid">
-    <div className="field">
-      <label>Full name</label>
-      <input
-        type="text"
-        value={fullName}
-        onChange={(event) => setFullName(event.target.value)}
-        placeholder="e.g. Joy Senetwo"
-        required
-      />
-    </div>
-
-    <div className="field">
-      <label>Email address</label>
-      <input
-        type="email"
-        value={email}
-        onChange={(event) => setEmail(event.target.value)}
-        placeholder="you@example.com"
-        required
-      />
-    </div>
-
-    <div className="field">
-      <label>Password</label>
-      <input
-        type="password"
-        value={password}
-        onChange={(event) => setPassword(event.target.value)}
-        placeholder="At least 8 characters"
-        minLength="8"
-        required
-      />
-    </div>
-  </div>
-</section>
-
-
-          {/* ROLE */}
-
-          <section className="form-section">
-
-            <div className="form-section-heading">
-
-              <span>01</span>
-
-              <div>
-
-                <h2>Your role</h2>
-
-                <p>
-                  How will you participate in AlumniConnect?
-                </p>
-
-              </div>
-
-            </div>
-
-
-            <div className="role-grid">
-
-              <button
-                type="button"
-                className={`role-card ${
-                  role === "mentee" ? "selected" : ""
-                }`}
-                onClick={() => setRole("mentee")}
-              >
-
-                <strong>Mentee</strong>
-
-                <span>
-                  I'm looking for guidance and professional mentorship.
-                </span>
-
-              </button>
-
-
-              <button
-                type="button"
-                className={`role-card ${
-                  role === "mentor" ? "selected" : ""
-                }`}
-                onClick={() => setRole("mentor")}
-              >
-
-                <strong>Mentor</strong>
-
-                <span>
-                  I want to share my experience and support others.
-                </span>
-
-              </button>
-
-            </div>
-
-          </section>
-
-
-          {/* CAREER */}
-
-          <section className="form-section">
-
-            <div className="form-section-heading">
-
-              <span>02</span>
-
-              <div>
-
-                <h2>Career direction</h2>
-
-                <p>
-                  Tell us which professional path interests you.
-                </p>
-
-              </div>
-
-            </div>
-
-
-            <div className="form-grid">
-
-              <div className="field">
-
-                <label>
-                  Career domain
-                </label>
-
-                <select
-                  value={domain}
-                  onChange={(event) => {
-                    setDomain(event.target.value);
-                    setCareer("");
-                  }}
-                  required
-                >
-
-                  <option value="">
-                    Select a career domain
-                  </option>
-
-                  {careerDomains.map((item) => (
-
-                    <option
-                      value={item.id}
-                      key={item.id}
-                    >
-                      {item.name}
-                    </option>
-
-                  ))}
-
-                </select>
-
-              </div>
-
-
-              <div className="field">
-
-                <label>
-                  Career path
-                </label>
-
-                <select
-                  value={career}
-                  onChange={(event) =>
-                    setCareer(event.target.value)
-                  }
-                  disabled={!selectedDomain}
-                  required
-                >
-
-                  <option value="">
-                    {selectedDomain
-                      ? "Select a career path"
-                      : "Select a domain first"}
-                  </option>
-
-                  {selectedDomain?.careers.map((item) => (
-
-                    <option
-                      value={item}
-                      key={item}
-                    >
-                      {item}
-                    </option>
-
-                  ))}
-
-                </select>
-
-              </div>
-
-
-              <div className="field">
-
-                <label>
-                  Professional experience
-                </label>
-
-                <select
-                  value={experience}
-                  onChange={(event) =>
-                    setExperience(event.target.value)
-                  }
-                  required
-                >
-
-                  <option value="">
-                    Select experience
-                  </option>
-
-                  <option>
-                    Student / Graduate
-                  </option>
-
-                  <option>
-                    0–2 years
-                  </option>
-
-                  <option>
-                    3–5 years
-                  </option>
-
-                  <option>
-                    6–10 years
-                  </option>
-
-                  <option>
-                    10+ years
-                  </option>
-
-                </select>
-
-              </div>
-
-            </div>
-
-          </section>
-
-
-          {/* SKILLS */}
-
-          <section className="form-section">
-
-            <div className="form-section-heading">
-
-              <span>03</span>
-
-              <div>
-
-                <h2>Skills & experience</h2>
-
-                <p>
-                  These details will contribute to your semantic profile.
-                </p>
-
-              </div>
-
-            </div>
-
-
-            <div className="field">
-
-              <label>
-                Skills
-              </label>
-
-              <input
-                type="text"
-                value={skills}
-                onChange={(event) =>
-                  setSkills(event.target.value)
-                }
-                placeholder="e.g. Python, Cloud Computing, Leadership, Aircraft Systems"
-                required
-              />
-
-              <small>
-                Separate multiple skills with commas.
-              </small>
-
-            </div>
-
-          </section>
-
-
-          {/* GOALS */}
-
-          <section className="form-section">
-
-            <div className="form-section-heading">
-
-              <span>04</span>
-
-              <div>
-
-                <h2>Career goals</h2>
-
-                <p>
-                  Describe what you want to achieve professionally.
-                </p>
-
-              </div>
-
-            </div>
-
-
-            <div className="field">
-
-              <label>
-                What are you hoping to achieve?
-              </label>
-
-              <textarea
-                value={goals}
-                onChange={(event) =>
-                  setGoals(event.target.value)
-                }
-                placeholder="Tell us about the career direction, knowledge or experience you are looking for..."
-                rows="5"
-                required
-              />
-
-            </div>
-
-
-            <div className="field">
-
-              <label>
-                Mentorship availability
-              </label>
-
-              <select
-                value={availability}
-                onChange={(event) =>
-                  setAvailability(event.target.value)
-                }
-                required
-              >
-
-                <option value="">
-                  Select availability
-                </option>
-
-                <option>
-                  Weekday mornings
-                </option>
-
-                <option>
-                  Weekday afternoons
-                </option>
-
-                <option>
-                  Weekday evenings
-                </option>
-
-                <option>
-                  Weekends
-                </option>
-
-                <option>
-                  Flexible
-                </option>
-
-              </select>
-
-            </div>
-
-          </section>
-
-
-          <div className="profile-submit">
-
-            <div>
-
-              <strong>
-                Ready to discover your matches?
-              </strong>
-
-              <span>
-                You can update your profile later.
-              </span>
-
-            </div>
-
-            <button
-              type="submit"
-              className="btn btn-primary btn-large"
-            >
-
-              Create profile
-
-              <ArrowRight size={17} />
-
-            </button>
-
-          </div>
-
-        </form>
-
-      </div>
-
-    </div>
-  );
+function ClerkSSOCallback() {
+  const navigate = useNavigate();
+  return <HandleSSOCallback
+    navigateToApp={() => navigate("/auth/complete", { replace: true })}
+    navigateToSignIn={() => navigate("/login", { replace: true })}
+    navigateToSignUp={() => navigate("/clerk-onboarding", { replace: true })}
+  />;
 }
 
-
-/* =========================
-   PLACEHOLDERS
-========================= */
-
-function Placeholder({ title }) {
-
-  return (
-
-    <div className="simple-page">
-
-      <div className="simple-card">
-
-        <Link to="/" className="brand">
-          <span className="brand-mark">A</span>
-          <span>AlumniConnect</span>
-        </Link>
-
-        <h1>{title}</h1>
-
-        <p>
-          This module is coming next.
-        </p>
-
-        <Link to="/" className="btn btn-primary">
-          Back home
-        </Link>
-
-      </div>
-
-    </div>
-  );
+// Every page outside sign-in and registration shares one footer.
+function WithFooter() {
+  return <><Outlet /><SiteFooter /></>;
 }
 
-
-/* =========================
-   ROUTER
-========================= */
+function ClerkLoginPage() {
+  // Do not redirect just because Clerk restored an existing browser session.
+  // Keep the login screen available so the user can choose a provider or
+  // sign in with a different AlumniConnect account.
+  return <LoginPage />;
+}
 
 function App() {
-
-  return (
-
-    <BrowserRouter>
-
-      <Routes>
-
-  {/* PUBLIC ROUTES */}
-
-  <Route
-    path="/"
-    element={<LandingPage />}
-  />
-
-  <Route
-    path="/login"
-    element={<LoginPage />}
-  />
-
-  <Route
-    path="/register"
-    element={<RegisterPage />}
-  />
-
-  <Route
-    path="/knowledge"
-    element={<Placeholder title="Knowledge Hub" />}
-  />
-
-
-  {/* MENTEE-ONLY ROUTES */}
-
-  <Route
-    path="/mentors"
-    element={
-      <ProtectedRoute allowedRoles={["mentee"]}>
-        <MentorsPage />
-      </ProtectedRoute>
-    }
-  />
-
-
-  {/* MENTOR-ONLY ROUTES */}
-
-  <Route
-    path="/mentor-workspace"
-    element={
-      <ProtectedRoute allowedRoles={["mentor"]}>
-        <Placeholder title="Mentor Workspace" />
-      </ProtectedRoute>
-    }
-  />
-
-
-  {/* SHARED AUTHENTICATED ROUTES */}
-
-  <Route
-    path="/profile"
-    element={
-      <ProtectedRoute allowedRoles={["mentor", "mentee"]}>
-        <Placeholder title="My Profile" />
-      </ProtectedRoute>
-    }
-  />
-
-  <Route
-    path="/notifications"
-    element={
-      <ProtectedRoute allowedRoles={["mentor", "mentee"]}>
-        <Placeholder title="Notifications" />
-      </ProtectedRoute>
-    }
-  />
-
-  <Route
-    path="/chats"
-    element={
-      <ProtectedRoute allowedRoles={["mentor", "mentee"]}>
-        <Placeholder title="Chats" />
-      </ProtectedRoute>
-    }
-  />
-
-
-  {/* EXISTING PLACEHOLDER */}
-
-  <Route
-    path="/admin"
-    element={<Placeholder title="Administrator Dashboard" />}
-  />
-
-  <Route
-    path="/mentor-profile"
-    element={<Placeholder title="Mentor Profile" />}
-  />
-
-
-  {/* FALLBACK */}
-
-  <Route
-    path="*"
-    element={<Navigate to="/" replace />}
-  />
-
-</Routes>
-
-    </BrowserRouter>
-  );
+  const communityRoles = ["mentor", "mentee", "admin"];
+  return <BrowserRouter>{import.meta.env.VITE_CLERK_PUBLISHABLE_KEY && <ClerkSessionBridge />}<SessionRoleSync /><Routes>
+    <Route path="/login" element={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY ? <ClerkLoginPage /> : <LoginPage />} />
+    <Route path="/register" element={<RegisterPage />} />
+    <Route path="/verify-email" element={<VerifyEmailPage />} />
+    <Route path="/reset-password" element={<ResetPasswordPage />} />
+    <Route path="/sso-callback" element={<ClerkSSOCallback />} />
+    <Route path="/clerk-onboarding" element={<ClerkOnboardingPage />} />
+    <Route path="/auth/complete" element={<ClerkAuthComplete />} />
+    <Route element={<WithFooter />}>
+    <Route path="/" element={<LandingPage />} />
+    <Route path="/knowledge" element={<KnowledgePage />} />
+    <Route path="/directory" element={<ProtectedRoute allowedRoles={communityRoles}><DirectoryPage /></ProtectedRoute>} />
+    <Route path="/mentors" element={<ProtectedRoute allowedRoles={["mentee"]}><MentorsPage /></ProtectedRoute>} />
+    <Route path="/my-mentorships" element={<ProtectedRoute allowedRoles={["mentee"]}><MyMentorshipsPage /></ProtectedRoute>} />
+    <Route path="/mentor-workspace" element={<ProtectedRoute allowedRoles={["mentor"]}><MentorWorkspacePage /></ProtectedRoute>} />
+    <Route path="/profile" element={<ProtectedRoute allowedRoles={communityRoles}><MyProfilePage /></ProtectedRoute>} />
+    <Route path="/notifications" element={<ProtectedRoute allowedRoles={communityRoles}><NotificationsPage /></ProtectedRoute>} />
+    <Route path="/chats" element={<ProtectedRoute allowedRoles={communityRoles}><ChatsPage /></ProtectedRoute>} />
+    <Route path="/admin" element={<ProtectedRoute allowedRoles={["admin"]}><AdminDashboard /></ProtectedRoute>} />
+    <Route path="/mentor-profile/:mentorId" element={<ProtectedRoute allowedRoles={["mentee"]}><MentorProfilePage /></ProtectedRoute>} />
+    <Route path="/admin-knowledge" element={<ProtectedRoute allowedRoles={["admin"]}><AdminKnowledgePage /></ProtectedRoute>} />
+    <Route path="/admin/community" element={<ProtectedRoute allowedRoles={["admin"]}><AdminCommunityPage /></ProtectedRoute>} />
+    <Route path="/admin-announcements" element={<ProtectedRoute allowedRoles={["admin"]}><AdminAnnouncementsPage /></ProtectedRoute>} />
+    <Route path="/admin/users" element={<ProtectedRoute allowedRoles={["admin"]}><AdminUsersPage /></ProtectedRoute>} />
+    <Route path="/admin/operations" element={<ProtectedRoute allowedRoles={["admin"]}><AdminOperationsPage /></ProtectedRoute>} />
+    <Route path="/availability" element={<ProtectedRoute allowedRoles={["mentor"]}><AvailabilityPage /></ProtectedRoute>} />
+    <Route path="/booking" element={<ProtectedRoute allowedRoles={communityRoles}><BookingPage /></ProtectedRoute>} />
+    </Route>
+    <Route path="*" element={<Navigate to="/" replace />} />
+  </Routes></BrowserRouter>;
 }
-
 
 export default App;

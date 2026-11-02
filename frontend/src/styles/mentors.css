@@ -1,0 +1,75 @@
+/* Mentor discovery and the mentor profile view. Palette: crimson, cod gray, white. */
+
+/* Request state chips */
+.mentor-card-badges { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; align-items: flex-start; }
+.request-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.request-pending { background: var(--color-surface-sunken); color: #1c1c1c; border: 1px solid var(--color-border-strong); }
+.request-accepted { background: #1c1c1c; color: #fff; border: 1px solid #1c1c1c; }
+.request-declined { background: #fff; color: var(--color-accent-hover); border: 1px solid var(--color-accent); }
+
+/* Next step with a mentor, shared by the list cards and the profile page */
+.request-state { display: grid; gap: 12px; min-width: 0; }
+.request-state p { margin: 0; color: var(--color-text-muted); font-size: var(--text-sm); line-height: 1.5; }
+.request-state-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.request-state .btn { justify-self: start; }
+.mentor-card-actions { display: grid; gap: 12px; align-items: start; }
+.mentor-card-actions > .btn-outline { justify-self: start; }
+
+/* Mentor profile page */
+.mp-page { max-width: 1120px; margin: 0 auto; padding: 24px 24px 72px; }
+.mp-page *, .mp-page *::before, .mp-page *::after { box-sizing: border-box; }
+.mp-back { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 18px; color: var(--color-text-muted); font-weight: 600; font-size: var(--text-base); }
+.mp-back:hover { color: var(--color-accent); }
+.mp-layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 24px; align-items: start; }
+.mp-main { display: grid; gap: 16px; min-width: 0; }
+.mp-aside { position: sticky; top: 88px; }
+.mp-card { padding: 24px; border: 1px solid var(--color-border); border-radius: 16px; background: #fff; }
+.mp-card h2 { margin: 0 0 12px; font-family: var(--font-display); font-size: var(--text-lg); color: #1c1c1c; }
+.mp-card p { margin: 0; line-height: 1.65; font-size: var(--text-base); }
+.mp-hero { padding: 0; overflow: hidden; }
+.mp-cover { height: 96px; background: radial-gradient(360px 160px at 100% 0%, rgba(226, 7, 20, 0.5), transparent 70%), #1c1c1c; }
+.mp-avatar {
+  display: grid;
+  place-items: center;
+  width: 96px;
+  height: 96px;
+  margin: -48px 0 0 24px;
+  overflow: hidden;
+  border: 4px solid #fff;
+  border-radius: 50%;
+  background: #1c1c1c;
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+}
+.mp-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.mp-hero-body { padding: 14px 24px 24px; }
+.mp-hero-title { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; justify-content: space-between; }
+.mp-hero-title h1 { margin: 0; font-family: var(--font-display); font-size: 1.75rem; letter-spacing: -0.03em; color: #1c1c1c; }
+.mp-hero-title p { margin-top: 4px; color: var(--color-text-muted); }
+.mp-facts { display: flex; flex-wrap: wrap; gap: 10px 22px; margin: 16px 0 0; padding: 0; list-style: none; color: var(--color-text-muted); font-size: var(--text-sm); }
+.mp-facts li { display: inline-flex; align-items: center; gap: 7px; }
+.mp-facts svg { color: var(--color-accent); }
+.mp-note { margin-bottom: 16px !important; color: var(--color-text-muted); font-size: var(--text-sm) !important; }
+.mp-empty { display: grid; justify-items: start; gap: 12px; }
+.mp-skeleton { min-height: 260px; background: linear-gradient(90deg, #f1f1f1, #fafafa, #f1f1f1); }
+
+@media (max-width: 900px) {
+  .mp-layout { grid-template-columns: 1fr; }
+  .mp-aside { position: static; }
+  .mp-page { padding: 16px 16px 56px; }
+}
+
+/* Card actions: View profile beside the next step, which wraps below when long. */
+.mentor-card-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; }
+.mentor-card-actions .request-state { flex: 1 1 240px; }

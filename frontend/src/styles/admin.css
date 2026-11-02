@@ -1,0 +1,219 @@
+/* Admin console. One container width, one heading style and one set of form controls
+   across Overview, Members, Operations, Knowledge, Announcements and Events & jobs.
+   Palette: crimson, cod gray, white. */
+
+/* ---- Shared container and heading ---- */
+.admin-dashboard-page,
+.admin-tool-page,
+.admin-knowledge-page,
+.admin-community {
+  width: min(1180px, calc(100% - 48px));
+  max-width: none;
+  margin: 0 auto;
+  padding: 32px 0 72px;
+}
+.admin-community { display: grid; gap: 20px; }
+
+.admin-eyebrow,
+.admin-knowledge-page .content-page-heading > div:first-child,
+.admin-community > header .eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-accent-hover);
+  font-size: var(--text-xs);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.admin-knowledge-page .content-page-heading > div:first-child svg { width: 15px; height: 15px; }
+.admin-eyebrow-dot { width: 4px; height: 4px; border-radius: 50%; background: currentColor; opacity: 0.6; }
+
+.admin-dashboard-heading h1,
+.admin-tool-heading h1,
+.admin-knowledge-page .content-page-heading h1,
+.admin-community > header h1 {
+  margin: 8px 0 6px;
+  color: #1c1c1c;
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+.admin-dashboard-heading p,
+.admin-tool-heading p,
+.admin-knowledge-page .content-page-heading p,
+.admin-community > header p { margin: 0; color: var(--color-text-muted); font-size: var(--text-base); }
+.admin-knowledge-page .content-page-heading { margin-bottom: 24px; }
+
+/* ---- Surfaces ---- */
+.admin-metric-card,
+.admin-surface,
+.admin-quick-actions,
+.admin-member-browser,
+.admin-ops-workspace,
+.admin-ops-summary article,
+.admin-members-total,
+.admin-knowledge-page .content-panel,
+.admin-knowledge-page .content-resource-row {
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: var(--color-surface);
+  box-shadow: none;
+}
+.admin-metric-icon,
+.admin-total-icon,
+.admin-ops-summary-icon,
+.admin-activity-icon,
+.admin-attention-row-icon {
+  background: #1c1c1c;
+  color: #fff;
+}
+.admin-metric-card-link:hover { border-color: var(--color-accent); }
+
+/* Chart bars use the brand crimson at full strength. */
+.admin-chart-bar { background: var(--color-accent); }
+
+/* ---- Members table ---- */
+.admin-member-table { min-width: 960px; }
+.admin-table th { padding: 0 16px; background: transparent; color: var(--color-text-muted); letter-spacing: 0.08em; }
+.admin-table thead { background: var(--color-surface-sunken); }
+.admin-table td { padding: 14px 16px; font-size: var(--text-sm); }
+.admin-member-actions { justify-content: flex-end; gap: 8px; }
+.admin-member-actions select,
+.admin-member-actions button,
+.admin-report-status {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 10px;
+  background: var(--color-surface);
+  color: #1c1c1c;
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+.admin-member-actions select { min-width: 132px; max-width: none; }
+.admin-member-actions .admin-suspend-action { color: var(--color-accent-hover); }
+.admin-member-actions .admin-suspend-action:hover { border-color: var(--color-accent); background: #fff5f5; }
+.admin-member-actions button:focus-visible,
+.admin-member-actions select:focus-visible,
+.admin-report-status:focus-visible { outline: 3px solid rgba(226, 7, 20, 0.28); outline-offset: 1px; }
+.admin-search-box,
+.admin-filter-select select { min-height: 44px; height: 44px; border-color: var(--color-border-strong); border-radius: 12px; font-size: var(--text-sm); }
+.admin-search-box input { font-size: var(--text-sm); }
+.admin-search-box:focus-within { border-color: var(--color-accent); box-shadow: 0 0 0 3px rgba(226, 7, 20, 0.2); }
+.admin-role-pill.role-admin { background: #1c1c1c; color: #fff; }
+
+/* ---- Operations tabs ---- */
+.admin-ops-tabs button.is-selected { background: #1c1c1c; color: #fff; border-color: #1c1c1c; }
+.admin-ops-tabs button.is-selected .admin-tab-count { background: var(--color-accent); color: #fff; }
+
+/* ---- Forms (Knowledge Hub manager, announcements) ---- */
+.admin-knowledge-page .content-panel { padding: 24px; }
+.admin-knowledge-page .content-panel h2 { margin: 0 0 18px; font-family: var(--font-display); font-size: var(--text-lg); color: #1c1c1c; }
+.admin-knowledge-page form { display: grid; gap: 18px; }
+.admin-knowledge-page .content-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.admin-knowledge-page label.block {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  color: #1c1c1c;
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+.admin-knowledge-page label.block small { margin: 0; color: var(--color-text-muted); font-size: var(--text-xs); font-weight: 400; }
+.admin-knowledge-page input:not([type="checkbox"]),
+.admin-knowledge-page textarea {
+  width: 100%;
+  min-height: 46px;
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 12px;
+  background: var(--color-surface);
+  color: #1c1c1c;
+  font: inherit;
+  font-size: var(--text-base);
+  font-weight: 400;
+}
+.admin-knowledge-page textarea { resize: vertical; }
+.admin-knowledge-page input:focus-visible,
+.admin-knowledge-page textarea:focus-visible { outline: 3px solid rgba(226, 7, 20, 0.28); border-color: var(--color-accent); }
+.admin-knowledge-page label.flex { display: flex; align-items: center; gap: 10px; font-size: var(--text-sm); font-weight: 600; color: #1c1c1c; }
+.admin-knowledge-page input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--color-accent); }
+.admin-knowledge-page .content-panel > form > p { margin: 0; color: var(--color-text-muted); font-size: var(--text-sm); }
+
+.admin-knowledge-page button.bg-red-700,
+.admin-knowledge-page form button.btn {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--color-accent);
+  color: #fff;
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+.admin-knowledge-page button.bg-red-700:hover,
+.admin-knowledge-page form button.btn:hover { background: var(--color-accent-hover); }
+.admin-knowledge-page button:disabled { opacity: 0.6; cursor: not-allowed; }
+.admin-knowledge-page .content-page-section > div:first-child { margin-bottom: 14px; }
+.admin-knowledge-page .content-page-section h2 { margin: 0; font-family: var(--font-display); font-size: var(--text-lg); color: #1c1c1c; }
+.admin-knowledge-page .content-page-section > div:first-child button {
+  min-height: 38px; padding: 0 14px; border: 1px solid var(--color-border-strong); border-radius: 10px;
+  background: var(--color-surface); color: #1c1c1c; font: inherit; font-size: var(--text-sm); font-weight: 600; cursor: pointer; text-decoration: none;
+}
+
+/* ---- Resource rows ---- */
+.admin-knowledge-page .content-resource-list { display: grid; gap: 12px; }
+.admin-knowledge-page .content-resource-row { display: flex; gap: 20px; align-items: flex-start; justify-content: space-between; padding: 18px 20px; }
+.admin-knowledge-page .content-resource-row h3 { margin: 0; font-family: var(--font-display); font-size: var(--text-base); color: #1c1c1c; }
+.admin-knowledge-page .content-resource-row p { margin: 4px 0 0; }
+.admin-knowledge-page .content-resource-row > div:last-child { display: flex; flex-wrap: nowrap; gap: 8px; flex: none; }
+.admin-knowledge-page .content-resource-row > div:last-child button {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 38px; padding: 0 14px;
+  border: 1px solid var(--color-border-strong); border-radius: 10px; background: var(--color-surface);
+  color: #1c1c1c; font: inherit; font-size: var(--text-sm); font-weight: 600; cursor: pointer;
+}
+.admin-knowledge-page .content-resource-row > div:last-child button:hover { background: var(--color-surface-sunken); }
+.admin-knowledge-page .content-resource-row > div:last-child button:last-child { width: 38px; padding: 0; color: var(--color-accent-hover); }
+.admin-knowledge-page .content-resource-row > div:last-child button:last-child:hover { border-color: var(--color-accent); background: #fff5f5; }
+.admin-knowledge-page .content-resource-row a { display: inline-flex; align-items: center; gap: 4px; margin-top: 8px; color: var(--color-accent-hover); font-size: var(--text-sm); font-weight: 700; }
+.admin-knowledge-page .content-resource-row a svg { width: 14px; height: 14px; }
+.admin-knowledge-page .content-resource-row span.rounded-full { padding: 3px 10px; font-size: var(--text-xs); font-weight: 700; }
+.admin-knowledge-page .bg-green-100 { background: #1c1c1c; color: #fff; }
+.admin-knowledge-page .bg-amber-100 { background: #fff5f5; color: var(--color-accent-hover); box-shadow: inset 0 0 0 1px rgba(226, 7, 20, 0.3); }
+
+@media (max-width: 760px) {
+  .admin-dashboard-page, .admin-tool-page, .admin-knowledge-page, .admin-community { width: calc(100% - 32px); padding-top: 24px; }
+  .admin-knowledge-page .content-form-grid { grid-template-columns: 1fr; }
+  .admin-knowledge-page .content-resource-row { flex-direction: column; }
+  .admin-community-grid { grid-template-columns: 1fr; }
+}
+
+/* ---- Status and role colours: green = good, red = stopped, amber = waiting ---- */
+.admin-status-pill.status-active,
+.admin-status-pill.status-accepted,
+.admin-verification.verified { background: #e7f6ed; color: #0b6b34; }
+.admin-status-pill.status-active i,
+.admin-status-pill.status-accepted i,
+.admin-verification.verified i { background: #16a34a; }
+.admin-status-pill.status-suspended,
+.admin-status-pill.status-declined { background: #fdecec; color: #b3121b; }
+.admin-status-pill.status-suspended i,
+.admin-status-pill.status-declined i { background: var(--color-accent); }
+.admin-role-pill.role-mentor { background: #e8efff; color: #1d4ed8; }
+.admin-role-pill.role-mentee { background: #f1ebff; color: #6d28d9; }
+
+/* The dot on the "Community" switch in the navbar. */
+.workspace-switch-link::before { background: #16a34a; }
+
+/* Report reasons are sentences; do not title-case them. */
+.admin-report-reason { text-transform: none; }
