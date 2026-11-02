@@ -60,3 +60,6 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+# User uploads and local backups
+backend/uploads/
+*.patch
