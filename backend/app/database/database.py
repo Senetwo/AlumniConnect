@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
@@ -23,6 +24,29 @@ class Settings(BaseSettings):
     embedding_model: str = ""
 
     llm_api_key: str = ""
+    email_verification_required: bool = True
+    login_otp_required: bool = True
+    # Development only: when email delivery fails, print one-time links and codes in the
+    # backend terminal instead of failing. Off by default so codes are only ever sent by email.
+    email_dev_fallback: bool = False
+    # Demo/test accounts are stored as name+tag@gmail.com so their codes land in one inbox.
+    # When on, members sign in with the clean tag@gmail.com form and never see the plus address.
+    plus_alias_login: bool = False
+    # How long a password sign-in stays valid. Sign-in already needs an emailed code.
+    access_token_expire_minutes: int = 480
+    frontend_base_url: str = "http://localhost:5173"
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_username: str = ""
+    smtp_password: str = ""
+    smtp_from_email: str = ""
+    smtp_use_ssl: bool = False
+    smtp_use_starttls: bool = True
+    admin_bootstrap_email: str = Field(default="", validation_alias="ALUMNICONNECT_ADMIN_EMAIL")
+    admin_bootstrap_token: str = Field(default="", validation_alias="ALUMNICONNECT_ADMIN_TOKEN")
+    clerk_secret_key: str = ""
+    clerk_jwt_key: str = ""
+    clerk_authorized_parties: str = "http://localhost:5173,http://127.0.0.1:5173"
 
     model_config = SettingsConfigDict(
         env_file=BASE_DIR / ".env",
