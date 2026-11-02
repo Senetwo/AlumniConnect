@@ -82,10 +82,21 @@ npm run build
 
 Backend tests use an in-memory SQLite database and do not touch your configured database. The same checks run in GitHub Actions on every push and pull request; the backend job uploads a JUnit report as an artifact.
 
+## Evidence and evaluation
+
+```powershell
+# from backend/ (needs the model folder from EMBEDDING_MODEL; set DATABASE_URL and SECRET_KEY)
+.\.venv\Scripts\python.exe -m evaluation.eval_matching          # writes docs/evidence/matching_eval.md/.json
+.\.venv\Scripts\python.exe -m pytest -q -W ignore --junitxml=pytest-report.xml
+.\.venv\Scripts\python.exe -m evaluation.make_test_record pytest-report.xml ../docs/evidence/test_record.md
+```
+
+Results and discussion are in `docs/chapters-4-6-draft.md` (Chapter 5) and `docs/evidence/`.
+
 ## Known limitations
 
 - No automated frontend or end-to-end tests yet; browser workflows are checked manually.
-- Mentor-match quality has not been evaluated against labelled relevance data.
+- Mentor matching has only a small synthetic baseline evaluation (21 queries, author-labelled); it does not show the fine-tuned model beating a keyword baseline.
 - No performance, load or usability measurements yet.
 - Email delivery depends on SMTP configuration; social sign-in needs registered provider apps.
 - No production deployment yet (planned for Sprint III).

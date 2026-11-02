@@ -100,7 +100,7 @@ sequenceDiagram
 
 ### 4.4.1 Architecture
 
-The application uses a client-server architecture. The React single-page client presents the user workflows and calls the FastAPI REST API. API routers implement authentication, profiles, matching, mentorship, bookings, chat, notifications, networking, knowledge resources and administration. SQLAlchemy models persist structured records in the configured database. Matching uses a Sentence Transformers embedding model and ChromaDB persistent collection for semantic mentor search. SMTP is an optional configured integration for email-related flows.
+The application uses a client-server architecture. The React single-page client presents the user workflows and calls the FastAPI REST API. API routers implement authentication, profiles, matching, mentorship, bookings, chat, notifications, networking, knowledge resources and administration. SQLAlchemy models persist structured records in the configured database. Matching uses a Sentence Transformers embedding model and ChromaDB persistent collection for semantic mentor search. SMTP is an optional configured integration for email-related flows. Clerk is an optional external identity provider: when configured, the client obtains a Clerk session token and the backend verifies it before mapping it to a local user.
 
 ```mermaid
 flowchart TB
@@ -120,6 +120,7 @@ flowchart TB
   Embed[Sentence Transformers model]
   Chroma[(ChromaDB vector collection)]
   SMTP[SMTP service, when configured]
+  Clerk[Clerk identity service, when configured]
   User --> Pages --> ApiClient --> Routes
   Routes --> Auth
   Routes --> Services
@@ -128,6 +129,7 @@ flowchart TB
   MatchSvc --> Embed
   MatchSvc --> Chroma
   Services -. email flows .-> SMTP
+  Auth -. token verification .-> Clerk
 ```
 
 ### 4.4.2 Data Model
@@ -155,7 +157,7 @@ The exact physical schema is defined by the SQLAlchemy models and database confi
 
 ### 4.4.3 Security and Access Design
 
-Authentication uses password hashing and signed bearer tokens. Protected endpoints identify the current user and apply role or ownership checks for sensitive actions. The design also includes email verification, account activity state, admin bootstrap auditing and administrative action records. Directory visibility is controlled at profile level. These controls reduce unauthorized access paths, but the presence of controls in code is not a substitute for a full security assessment. Production deployment should use a strong secret, HTTPS, restricted database access and configured secrets outside version control.
+Authentication uses password hashing and signed bearer tokens. Protected endpoints identify the current user and apply role or ownership checks for sensitive actions. Password sign-in is followed by a second step: a six-digit one-time code sent by email (login challenge records, configurable). The design also includes email verification, password reset tokens, account activity state, admin bootstrap auditing and administrative action records. Directory visibility is controlled at profile level. These controls reduce unauthorized access paths, but the presence of controls in code is not a substitute for a full security assessment. Production deployment should use a strong secret, HTTPS, restricted database access and configured secrets outside version control.
 
 ## 4.5 Chapter Summary
 
@@ -165,7 +167,7 @@ This chapter translated the implemented AlumniConnect scope into functional, qua
 
 ## 5.1 Introduction
 
-This chapter describes the implementation of AlumniConnect and the evidence available for assessing it. The system is implemented as a React browser client backed by a FastAPI service, a relational database, and a semantic mentor-matching subsystem using Sentence Transformers and ChromaDB. The repository contains automated backend tests for several workflows. No user-study dataset, performance benchmark, deployment report or consolidated test-run results were present in the materials inspected; therefore, this chapter distinguishes implemented behavior and test coverage from measured outcomes that must be added from the final project evaluation.
+This chapter describes the implementation of AlumniConnect and the evidence available for assessing it. The system is implemented as a React browser client backed by a FastAPI service, a relational database, and a semantic mentor-matching subsystem using Sentence Transformers and ChromaDB. The repository contains 85 automated backend tests, a frontend lint and build check, a continuous-integration workflow, and a small mentor-matching evaluation. Measured results are in Sections 5.5 and 5.6 and in `docs/evidence/`. No user-study, performance, deployment or security-test measurements have been collected yet; the chapter states this explicitly rather than implying them.
 
 ## 5.2 Implementation Environment
 
@@ -203,26 +205,42 @@ Structured application data is represented by SQLAlchemy models with foreign key
 
 ## 5.5 Verification Approach and Evidence
 
-The repository includes pytest tests for authentication, profiles, mentor matching, mentorship, chat, admin operations, vector storage and related API behavior. The visible matching unit tests check ranking order, score conversion, inclusion of candidate mentors and empty-candidate behavior. Mentorship API tests cover authentication, request creation, duplicate prevention, invalid mentors, role restrictions and mentor decisions. These tests are evidence of defined behavior when executed successfully; source files alone do not establish the outcome of the latest test run.
+The backend has 13 pytest modules (85 tests) run against an in-memory SQLite database. The full suite was executed on 2 November 2026 at commit `e87ad93`: **85 passed, 0 failed, 0 skipped**. The per-test record (module, test, expected behaviour, actual result, corrective action) is in `docs/evidence/test_record.md`, generated from the pytest JUnit report by `backend/evaluation/make_test_record.py`. The frontend passes `npm run lint` and `npm run build`. The same checks are defined in `.github/workflows/ci.yml` and run on each push and pull request.
 
-| Area | Evidence in repository | Result to report after execution |
+| Area | Test modules | Result (2 Nov 2026) |
 |---|---|---|
-| Authentication and profiles | `backend/tests/test_auth.py`, `backend/tests/test_profiles_api.py` | Test count, pass/fail, environment and date |
-| Matching | `backend/tests/test_matching.py`, `backend/tests/test_matching_api.py`, vector-store tests | Test count and any real-model evaluation protocol |
-| Mentorship | `backend/tests/test_mentorship.py` | Test count, pass/fail and defects/retests |
-| Chat and notifications | Corresponding backend test modules | Test count and pass/fail |
-| Administration and network | Admin and related API test modules | Test count, pass/fail and access-control cases |
-| Browser workflows | Frontend pages and components | Manual or automated end-to-end scenarios and observed outcomes |
+| Authentication, OTP, Clerk | `test_auth`, `test_login_otp`, `test_plus_alias_login`, `test_clerk_auth` | 25 passed |
+| Profiles | `test_profiles_api` | 4 passed |
+| Matching | `test_matching`, `test_matching_api`, `test_mentor_index_sync`, `test_vector_store` | 18 passed |
+| Mentorship and chat | `test_mentorship`, `test_chat` | 17 passed |
+| Administration and community | `test_admin_api`, `test_admin_bootstrap`, `test_community_feed` | 21 passed |
 
-For the final report, run the agreed test suite and replace the final column with actual recorded output. Add the actual evaluation date, environment, number of cases, failures, fixes and retests. If user acceptance is part of the project objectives, describe participants, consent, tasks, instrument and results only when those data have been collected.
+The tests cover expected behaviour, authentication and role restrictions, duplicate and invalid requests (for example duplicate active mentorship requests and invalid mentor identifiers) and one-time admin bootstrap. They do not yet cover dependency failures such as an unavailable SMTP server or vector store. No frontend component or end-to-end tests exist; browser workflows still need a manual run recorded with screenshots (to be added by the author after the demonstration rehearsal).
 
 ## 5.6 Evaluation Results and Discussion
 
-The implementation evidence demonstrates that the repository contains modules for the principal requirements: account and profile management, mentor discovery, mentorship requests, scheduling, communication, networking, knowledge resources and administration. Existing tests encode expected behaviors for core API and service paths. A quantitative requirement-coverage percentage cannot be calculated reliably from the source listing alone because the final approved requirements, complete test execution record and acceptance criteria are not supplied here.
+### Mentor-matching baseline evaluation
 
-The matching implementation uses semantic profile embeddings and cosine-based search. This establishes the implemented method, not its effectiveness for real alumni outcomes. Evaluation should compare recommendations against a documented relevance judgment or user feedback, specify the profile sample and model version, and report appropriate ranking measures or task outcomes. Likewise, no response-time, concurrency, usability, reliability or security-test measurements are available in the inspected materials. Do not claim those quality attributes have met thresholds until measured under stated conditions.
+`backend/evaluation/eval_matching.py` ranks 14 synthetic mentors for 21 synthetic mentee queries (3 per career area) and compares a random ranking, a TF-IDF keyword baseline, the base `all-MiniLM-L6-v2` model and the fine-tuned model used by the application, using the production profile-text format. A mentor is relevant when they work in the same career area as the mentee (binary labels written by the author). Full output: `docs/evidence/matching_eval.md` and `.json`; the seed is fixed (42). With two relevant mentors per area, the maximum P@3 is 0.667.
 
-Important limitations for interpretation are the absence of documented user-study findings, deployment measurements, representative alumni data and a formal retention/backup policy. The recommendation service depends on the quality and completeness of profile text and the configured embedding model. External email delivery depends on SMTP configuration. The available evidence therefore supports a description of implemented functionality and encoded test expectations, but not a claim of validated adoption, production scalability or recommendation quality.
+| Query variant | System | P@1 | P@3 | Recall@3 | MRR |
+|---|---|---|---|---|---|
+| Full profile | random | 0.048 | 0.063 | 0.095 | 0.240 |
+| Full profile | TF-IDF keyword | 1.000 | 0.667 | 1.000 | 1.000 |
+| Full profile | base MiniLM | 1.000 | 0.667 | 1.000 | 1.000 |
+| Full profile | fine-tuned | 1.000 | 0.667 | 1.000 | 1.000 |
+| Skills and goals only | random | 0.190 | 0.143 | 0.214 | 0.376 |
+| Skills and goals only | TF-IDF keyword | 1.000 | 0.508 | 0.762 | 1.000 |
+| Skills and goals only | base MiniLM | 0.952 | 0.619 | 0.929 | 0.968 |
+| Skills and goals only | fine-tuned | 0.952 | 0.635 | 0.952 | 0.968 |
+
+**Interpretation.** All real systems far exceed random ranking, so the matching pipeline works as a relevance aid. However, this evaluation does not show that the fine-tuned model is better than a keyword baseline: with full profiles all three systems reach the ceiling, and with skills and goals only the semantic models retrieve more of the relevant mentors in the top three (Recall@3 0.93 and 0.95 against 0.76) while the keyword baseline ranks the first mentor slightly better (P@1 1.00 against 0.95). With 21 queries these differences are one or two queries and are not statistically meaningful. The dataset is small, synthetic, labelled by one person, and the queries share vocabulary with the mentor profiles, so it is too easy to separate the systems. The overlap between the fine-tuning data and these phrasings was not verified. A harder set (paraphrased queries without shared vocabulary, mentors from several overlapping areas, graded relevance labelled by a domain expert) is planned before any claim of recommendation quality.
+
+### Overall assessment
+
+The evidence supports these statements: the principal modules are implemented and integrated; 85 automated backend tests and the frontend lint/build pass; and the matching pipeline ranks same-area mentors well above chance on a small synthetic set. It does not yet support claims about recommendation quality relative to simple baselines, response time, concurrency, usability, security assurance or production scalability, because those were not measured.
+
+Known limitations: no frontend or end-to-end tests; no usability study with representative users; no deployment measurements; no formal retention or backup policy; email delivery depends on SMTP configuration; recommendation quality depends on profile completeness and on the embedding model.
 
 ## 5.7 Chapter Summary
 
