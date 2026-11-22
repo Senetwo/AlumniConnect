@@ -7,6 +7,7 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 
 
 BASE_DIR = Path(__file__).resolve().parents[3]
+BACKEND_DIR = BASE_DIR / "backend"
 
 
 class Settings(BaseSettings):
@@ -21,7 +22,9 @@ class Settings(BaseSettings):
 
     chroma_persist_directory: str = "./chroma_data"
 
-    embedding_model: str = ""
+    # The fine-tuned model is shipped with the repository through Git LFS.
+    # Relative overrides can be rooted at either the repository or backend directory.
+    embedding_model: str = "backend/ml_models/alumniconnect_sbert_finetuned"
 
     llm_api_key: str = ""
     # "Ask the library": answers are generated only from retrieved library passages.

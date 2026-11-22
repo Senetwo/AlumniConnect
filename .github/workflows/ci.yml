@@ -17,10 +17,13 @@ jobs:
       APP_ENV: test
       DATABASE_URL: sqlite:///./ci.db
       SECRET_KEY: ci-only-secret-not-used-anywhere-else
+      EMBEDDING_MODEL: ./ml_models/alumniconnect_sbert_finetuned
       EMAIL_VERIFICATION_REQUIRED: "false"
       LOGIN_OTP_REQUIRED: "false"
     steps:
       - uses: actions/checkout@v4
+        with:
+          lfs: true
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"

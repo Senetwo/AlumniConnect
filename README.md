@@ -2,6 +2,14 @@
 
 A mentorship and networking platform for alumni. Members build a profile, get semantically ranked mentor suggestions, request mentorship, book sessions, work together in a shared mentorship workspace, chat, and use the Knowledge Hub. Administrators manage users, moderation, and published resources.
 
+AlumniConnect supports professional connections across aviation, engineering, technology, commercial operations, finance, human resources, and other career areas. Its goal is to make alumni mentorship easier to discover, organize, and sustain.
+
+## Architecture
+
+The React and Vite frontend uses a FastAPI backend, SQLAlchemy with PostgreSQL for application data, and ChromaDB for semantic indexes. Mentor recommendations encode mentee and mentor profiles with the fine-tuned Sentence-Transformers model, retrieve candidates from ChromaDB, and rank them by cosine similarity. The Knowledge Hub uses the same embedding service to retrieve published resources for Ask the library.
+
+The main workflow is: a member creates a profile, receives ranked mentor suggestions, requests mentorship, and—after acceptance—uses a shared workspace to plan sessions, record notes, set goals, and track action items. The project also includes community, messaging, moderation, and knowledge-resource features.
+
 ## Features
 
 - **Accounts:** registration, email verification, password login with emailed one-time code, password reset, optional Clerk sign-in
@@ -24,6 +32,17 @@ A mentorship and networking platform for alumni. Members build a profile, get se
 | `data/` | Data notes (see `data/README.md`) |
 | `docs/` | Design notes and the Chapters 4-6 draft |
 | `.github/workflows/ci.yml` | CI: backend tests, frontend lint and build |
+
+## Technology
+
+| Layer | Tools |
+|---|---|
+| Frontend | React 19, Vite, JavaScript |
+| Backend | Python 3.13, FastAPI, SQLAlchemy |
+| Data | PostgreSQL, ChromaDB |
+| Matching | Sentence-Transformers, PyTorch |
+| Authentication | JWT, role-based access control, optional Clerk |
+| CI | GitHub Actions, Pytest, ESLint, Vite build |
 
 ## Prerequisites
 
@@ -75,6 +94,8 @@ npm run dev
 
 API docs: http://127.0.0.1:8000/docs. App: http://localhost:5173.
 
+The interactive API reference includes authentication, profiles, matching, mentorship, workspace, community, and administration endpoints. Protected routes require a valid authenticated session and apply role and ownership checks.
+
 The backend creates new workspace tables and applies the additive workspace migration at startup. Restart the backend after pulling changes. Existing bookings are linked to workspace sessions during migration. Run `seed_knowledge.py` to add the curated starter resources and rebuild their semantic index; it is safe to run again.
 
 The workspace is available from accepted mentorships under **My mentorships** or the mentor dashboard. Session bookings stay linked to their workspace sessions, and private notes are visible only to their author. See [`docs/mentorship-workspace.md`](docs/mentorship-workspace.md) for access rules, API routes, and migration details.
@@ -106,6 +127,8 @@ Backend tests use an in-memory SQLite database and do not touch your configured 
 
 Results and discussion are in `docs/chapters-4-6-draft.md` (Chapter 5) and `docs/evidence/`. Workspace behavior and data model notes are in `docs/mentorship-workspace.md`.
 
+The matching evaluation uses synthetic, author-labelled profile pairs. Its results are a small baseline study and do not establish performance on real alumni data; see the evidence and limitations above.
+
 ## Known limitations
 
 - No automated frontend or end-to-end tests yet; browser workflows are checked manually.
@@ -114,3 +137,11 @@ Results and discussion are in `docs/chapters-4-6-draft.md` (Chapter 5) and `docs
 - Email delivery depends on SMTP configuration; social sign-in needs registered provider apps.
 - Ask the library requires both an embedding model and an LLM API key for generated answers; its retrieval evaluation uses a small synthetic question set.
 - No production deployment yet (planned for Sprint III).
+
+## Academic context
+
+AlumniConnect is a final-year Computer Science project using Kenya Airways as the industry context. It applies software engineering, machine learning, database, and web development methods to alumni engagement and mentorship.
+
+## Author
+
+Senetwo — Computer Science final-year project.

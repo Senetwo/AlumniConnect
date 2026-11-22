@@ -35,6 +35,11 @@ model_cache/
 huggingface/
 *.safetensors
 ml_models/
+# Keep the production fine-tuned model available to the app and CI. Its weights
+# are stored through Git LFS; other local model artifacts remain ignored.
+!backend/ml_models/
+!backend/ml_models/alumniconnect_sbert_finetuned/
+!backend/ml_models/alumniconnect_sbert_finetuned/**
 *.zip
 
 # ChromaDB / local vector database
