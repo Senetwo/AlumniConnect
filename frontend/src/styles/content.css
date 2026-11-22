@@ -125,3 +125,58 @@
   font-weight: 400;
 }
 .profile-edit-grid textarea { min-height: 110px; resize: vertical; }
+
+/* Ask the library */
+.ask-library-form {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.ask-library-input {
+  flex: 1 1 280px;
+  min-height: 44px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.ask-library-result {
+  margin-top: var(--space-4);
+}
+
+.ask-library-answer {
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+.ask-library-answer h3 {
+  margin: var(--space-4) 0 var(--space-2);
+  font-size: 0.95rem;
+}
+
+.ask-library-answer ul {
+  margin: 0;
+  padding-left: var(--space-5);
+}
+
+.ask-library-answer a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.ask-library-note {
+  margin: var(--space-4) 0 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.ask-library-error {
+  color: var(--status-danger-fg);
+}

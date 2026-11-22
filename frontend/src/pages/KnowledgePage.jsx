@@ -9,6 +9,8 @@ import {
   BriefcaseBusiness,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
+import AskTheLibrary from "../components/AskTheLibrary";
+import { getAuth } from "../services/authStorage";
 
 
 const categoryIcons = {
@@ -135,6 +137,8 @@ export default function KnowledgePage() {
           <span className="visually-hidden">Search learning resources</span>
         </label>
       </section>
+
+      {getAuth() && <AskTheLibrary />}
 
       <section className="content-page-section">
         <div className="knowledge-section-heading">

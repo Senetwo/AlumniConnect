@@ -38,6 +38,7 @@ class ConversationResponse(BaseModel):
     mentor_id: int
     mentee_id: int
     created_at: datetime
+    mentorship_status: str = "accepted"
     mentor_name: str = "Mentor"
     mentee_name: str = "Mentee"
     mentor_profile_picture_url: str | None = None
@@ -174,10 +175,11 @@ def list_conversations(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    # Closed (completed) mentorships stay listed so the conversation history remains readable.
     accepted_mentorships = (
         db.query(Mentorship)
         .filter(
-            Mentorship.status == "accepted",
+            Mentorship.status.in_(["accepted", "completed"]),
             (Mentorship.mentor_id == current_user.id)
             | (Mentorship.mentee_id == current_user.id),
         )
@@ -240,6 +242,7 @@ def list_conversations(
             "mentor_id": conversation.mentor_id,
             "mentee_id": conversation.mentee_id,
             "created_at": conversation.created_at,
+            "mentorship_status": mentorship.status,
             "mentor_name": mentor.full_name if mentor else "Mentor",
             "mentee_name": mentee.full_name if mentee else "Mentee",
             "mentor_profile_picture_url": mentor_profile.profile_picture_url if mentor_profile else None,
@@ -309,7 +312,7 @@ def send_message(
     if not mentorship:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="Messaging is unavailable for this mentorship.",
+            detail="This mentorship is closed. You can still read the conversation, but new messages cannot be sent.",
         )
 
     body = data.body.strip()

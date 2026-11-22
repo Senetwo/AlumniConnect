@@ -30,6 +30,8 @@ from app.api.admin import router as admin_router
 from app.api.knowledge import router as knowledge_router
 from app.api.network import router as network_router
 from app.api.community import router as community_router
+from app.api.workspace import router as workspace_router
+from app.database.workspace_migration import apply_workspace_migration
 from pathlib import Path
 from fastapi.staticfiles import StaticFiles
 def init_database():
@@ -151,6 +153,8 @@ def init_database():
                     )
                 )
 
+    apply_workspace_migration(engine)
+
     # Keep the hub useful on a fresh installation and when existing admin drafts
     # are unpublished. Add each starter only when its URL is not already present.
     with SessionLocal() as db:
@@ -242,6 +246,7 @@ app.include_router(profile_router)
 app.include_router(matches_router)
 app.include_router(auth_router)
 app.include_router(mentorship_router)
+app.include_router(workspace_router)
 app.include_router(bookings_router)
 app.include_router(chat_router)
 app.include_router(notifications_router)

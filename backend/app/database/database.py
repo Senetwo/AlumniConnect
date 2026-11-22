@@ -24,6 +24,13 @@ class Settings(BaseSettings):
     embedding_model: str = ""
 
     llm_api_key: str = ""
+    # "Ask the library": answers are generated only from retrieved library passages.
+    llm_model: str = "claude-opus-5-5"
+    rag_top_k: int = 4
+    # Cosine similarity below this means the passage is not about the question; with no
+    # passage above it the system answers "not in the library" without calling the LLM.
+    rag_min_similarity: float = 0.25
+    rag_questions_per_hour: int = 30
     email_verification_required: bool = True
     login_otp_required: bool = True
     # Development only: when email delivery fails, print one-time links and codes in the

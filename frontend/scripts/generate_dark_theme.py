@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parent.parent / "src"
 SOURCES = [
     "index.css", "App.css", "styles/design-system.css", "styles/landing.css",
     "styles/register.css", "styles/login.css", "styles/community.css", "styles/mentors.css",
-    "styles/content.css", "styles/chats.css", "styles/dashboard.css", "styles/admin.css", "styles/vibrance.css",
+    "styles/content.css", "styles/chats.css", "styles/dashboard.css", "styles/workspace.css", "styles/admin.css", "styles/vibrance.css",
 ]
 OUTPUT = ROOT / "styles" / "dark.css"
 SCOPE = ':root[data-theme="dark"]'
@@ -243,6 +243,33 @@ TOKENS = f"""{SCOPE} {{
 
 EXTRAS = f"""
 /* Hand-written dark rules for things the generator cannot infer. */
+{SCOPE} .available-marker {{ background: #4ade80; }}
+{SCOPE} .booked-marker {{ background: #60a5fa; }}
+{SCOPE} .calendar-legend span {{ color: #d7d7dc; }}
+{SCOPE} .ws-chip.is-completed, {SCOPE} .ws-chip.is-accepted, {SCOPE} .ws-chip.is-shared {{ background: rgba(74, 222, 128, 0.14); border-color: rgba(74, 222, 128, 0.4); color: #86efac; }}
+{SCOPE} .ws-chip.is-scheduled, {SCOPE} .ws-chip.is-in_progress {{ background: rgba(96, 165, 250, 0.16); border-color: rgba(96, 165, 250, 0.4); color: #93c5fd; }}
+{SCOPE} .ws-chip.is-on_hold, {SCOPE} .ws-chip.is-not_started {{ background: rgba(251, 191, 36, 0.14); border-color: rgba(251, 191, 36, 0.4); color: #fcd34d; }}
+{SCOPE} .ws-chip.is-cancelled {{ background: rgba(248, 113, 113, 0.14); border-color: rgba(248, 113, 113, 0.4); color: #fca5a5; }}
+{SCOPE} .ws-chip.is-private {{ background: rgba(167, 139, 250, 0.16); border-color: rgba(167, 139, 250, 0.4); color: #c4b5fd; }}
+{SCOPE} .ws-party small.is-mentor {{ background: rgba(96, 165, 250, 0.16); color: #93c5fd; }}
+{SCOPE} .ws-party small.is-mentee {{ background: rgba(167, 139, 250, 0.16); color: #c4b5fd; }}
+{SCOPE} .ws-attention {{ background: rgba(251, 191, 36, 0.08); border-color: rgba(251, 191, 36, 0.35); border-left-color: #d97706; }}
+{SCOPE} .ws-attention h2 {{ color: #fcd34d; }}
+{SCOPE} .ws-plain-list li.ws-alert-item {{ color: #fcd34d; }}
+{SCOPE} .ws-closed {{ background: rgba(74, 222, 128, 0.08); border-color: rgba(74, 222, 128, 0.4); }}
+{SCOPE} .ws-tab-count {{ background: #2a2a31; color: #ececef; }}
+
+{SCOPE} .admin-status-pill.status-completed {{ background: rgba(74, 222, 128, 0.14); color: #86efac; }}
+{SCOPE} .ws-feedback {{ background: rgba(74, 222, 128, 0.08); border-color: rgba(74, 222, 128, 0.35); }}
+{SCOPE} .ws-glance li.is-late {{ color: #fca5a5; }}
+{SCOPE} .match-reasons {{ background: rgba(74, 222, 128, 0.10); color: #86efac; }}
+{SCOPE} .pg-chip.is-confirmed {{ background: rgba(96, 165, 250, 0.16); border-color: rgba(96, 165, 250, 0.4); color: #93c5fd; }}
+{SCOPE} .availability-slot-item.is-available {{ background: rgba(74, 222, 128, 0.10); border-color: rgba(74, 222, 128, 0.35); }}
+{SCOPE} .availability-slot-item.is-available .availability-slot-indicator {{ background: #4ade80; }}
+{SCOPE} .availability-slot-item.is-available small {{ color: #86efac; }}
+{SCOPE} .availability-slot-item.is-booked {{ background: rgba(96, 165, 250, 0.12); border-color: rgba(96, 165, 250, 0.38); }}
+{SCOPE} .availability-slot-item.is-booked .availability-slot-indicator {{ background: #60a5fa; }}
+{SCOPE} .availability-slot-item.is-booked small, {SCOPE} .availability-slot-item.is-booked a {{ color: #93c5fd; }}
 {SCOPE} body {{ background: #121214; color: {TEXT}; }}
 {SCOPE} input::placeholder, {SCOPE} textarea::placeholder {{ color: #7c7c85; }}
 {SCOPE} input, {SCOPE} select, {SCOPE} textarea {{ background-color: {SURFACE}; color: {TEXT}; border-color: #45454c; }}

@@ -53,9 +53,24 @@ body { background-image: radial-gradient(900px 420px at 100% -80px, rgba(226, 7,
 .admin-role-pill.role-admin { background: var(--gradient-brand); color: #fff; }
 .admin-knowledge-page .bg-green-100 { background: var(--tint-green-bg); color: var(--tint-green-fg); }
 .pf-checklist li.is-done svg { background: #16a34a; }
-.available-marker, .booked-marker, .profile-completion-dot, .auth-security-note > span { background: #16a34a; }
+.profile-completion-dot, .auth-security-note > span { background: #16a34a; }
 .auth-security-note > span { box-shadow: 0 0 0 4px var(--tint-green-bg); }
 .status-active i, .verified i, .status-accepted i { background: #16a34a; }
 
 /* Footer: cod gray with the same crimson glow as the landing panels, not flat black. */
 .lp-footer { background: radial-gradient(700px 260px at 100% 0, rgba(226, 7, 20, 0.32), transparent 70%), #1c1c1c; }
+
+/* Calendar: available is green, booked is blue, so the two never read as the same state. */
+.available-marker, .booked-marker { width: 9px; height: 9px; }
+.available-marker { background: #16a34a; }
+.booked-marker { background: #2563eb; }
+.calendar-legend { gap: 22px; }
+.calendar-legend span { font-weight: 600; color: #4d4d4d; }
+.availability-slot-item.is-available { background: #f1faf4; border-color: #b7e3c6; }
+.availability-slot-item.is-available .availability-slot-indicator { background: #16a34a; }
+.availability-slot-item.is-booked { background: #eef3ff; border-color: #c3d4fb; }
+.availability-slot-item.is-booked .availability-slot-indicator { background: #2563eb; }
+.availability-slot-item.is-booked a { color: #1d4ed8; }
+.availability-slot-item.is-available small { color: #0b6b34; }
+.availability-slot-item.is-booked small { color: #1d4ed8; }
+.pg-chip.is-confirmed { background: #e8efff; border-color: #c3d4fb; color: #1d4ed8; }

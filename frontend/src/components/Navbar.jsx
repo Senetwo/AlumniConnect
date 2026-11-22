@@ -37,17 +37,22 @@ export default function Navbar({ landing = false }) {
   const isMentee = communityRole === "mentee";
 
   const closeMenu = () => setMenuOpen(false);
-  const navLink = (to, label, className = "") => (
+  // A mentorship workspace (/mentorships/:id/...) belongs to "My mentorships" / "Dashboard".
+  const inWorkspace = location.pathname.startsWith("/mentorships/");
+  const navLink = (to, label, className = "") => {
+    const active = location.pathname === to || (inWorkspace && (to === "/my-mentorships" || to === "/mentor-workspace"));
+    return (
     <Link
       key={`${to}-${label}`}
       to={to}
       onClick={closeMenu}
-      className={`${className} ${location.pathname === to ? "is-active" : ""}`.trim()}
-      aria-current={location.pathname === to ? "page" : undefined}
+      className={`${className} ${active ? "is-active" : ""}`.trim()}
+      aria-current={active ? "page" : undefined}
     >
       {label}
     </Link>
-  );
+    );
+  };
 
   useEffect(() => {
     const token = getAuth()?.token;

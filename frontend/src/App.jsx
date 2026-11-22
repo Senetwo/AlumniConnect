@@ -23,6 +23,13 @@ import AdminAnnouncementsPage from "./pages/AdminAnnouncementsPage";
 import AdminCommunityPage from "./pages/AdminCommunityPage";
 import AdminUsersPage from "./pages/AdminUsersPage";
 import AdminOperationsPage from "./pages/AdminOperationsPage";
+import WorkspaceLayout from "./pages/workspace/WorkspaceLayout";
+import OverviewTab from "./pages/workspace/OverviewTab";
+import SessionsTab from "./pages/workspace/SessionsTab";
+import SessionDetailPage from "./pages/workspace/SessionDetailPage";
+import NotesTab from "./pages/workspace/NotesTab";
+import GoalsTab from "./pages/workspace/GoalsTab";
+import ProgressTab from "./pages/workspace/ProgressTab";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import { apiRequest } from "./services/api";
@@ -192,7 +199,15 @@ function App() {
     <Route path="/directory" element={<ProtectedRoute allowedRoles={communityRoles}><DirectoryPage /></ProtectedRoute>} />
     <Route path="/mentors" element={<ProtectedRoute allowedRoles={["mentee"]}><MentorsPage /></ProtectedRoute>} />
     <Route path="/my-mentorships" element={<ProtectedRoute allowedRoles={["mentee"]}><MyMentorshipsPage /></ProtectedRoute>} />
-    <Route path="/mentor-workspace" element={<ProtectedRoute allowedRoles={["mentor"]}><MentorWorkspacePage /></ProtectedRoute>} />
+    <Route path="/mentorships/:mentorshipId" element={<ProtectedRoute allowedRoles={communityRoles}><WorkspaceLayout /></ProtectedRoute>}>
+      <Route index element={<OverviewTab />} />
+      <Route path="sessions" element={<SessionsTab />} />
+      <Route path="sessions/:sessionId" element={<SessionDetailPage />} />
+      <Route path="notes" element={<NotesTab />} />
+      <Route path="goals" element={<GoalsTab />} />
+      <Route path="progress" element={<ProgressTab />} />
+    </Route>
+    <Route path="/mentor-workspace"element={<ProtectedRoute allowedRoles={["mentor"]}><MentorWorkspacePage /></ProtectedRoute>} />
     <Route path="/profile" element={<ProtectedRoute allowedRoles={communityRoles}><MyProfilePage /></ProtectedRoute>} />
     <Route path="/notifications" element={<ProtectedRoute allowedRoles={communityRoles}><NotificationsPage /></ProtectedRoute>} />
     <Route path="/chats" element={<ProtectedRoute allowedRoles={communityRoles}><ChatsPage /></ProtectedRoute>} />

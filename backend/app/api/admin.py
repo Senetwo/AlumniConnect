@@ -9,6 +9,7 @@ from app.core.dependencies import get_db, require_role
 from app.models.admin_action import AdminActionAudit
 from app.models.knowledge_resource import KnowledgeResource
 from app.models.mentorship import Mentorship
+from app.models.workspace import MentorshipFeedback
 from app.models.network import ConnectionRequest, UserReport
 from app.models.profile import Profile
 from app.models.user import User
@@ -36,6 +37,7 @@ def dashboard(_admin: User = Depends(require_role("admin")), db: Session = Depen
     drafts = db.query(KnowledgeResource.id).filter(KnowledgeResource.is_published.is_(False)).count()
     connections_30d = db.query(ConnectionRequest.id).filter(ConnectionRequest.created_at >= start).count()
     reports_open = db.query(UserReport.id).filter(UserReport.status == "open").count()
+    feedback_count, feedback_avg = db.query(func.count(MentorshipFeedback.id), func.avg(MentorshipFeedback.rating)).one()
     return {
         "window": {"start": start.date().isoformat(), "end": now.date().isoformat(), "days": 30},
         "metrics": {
@@ -43,7 +45,8 @@ def dashboard(_admin: User = Depends(require_role("admin")), db: Session = Depen
             "new_members_30d": new_members,
             "active_members": None,
             "active_mentorships": mentorship_counts.get("accepted", 0),
-            "mentorships": {key: mentorship_counts.get(key, 0) for key in ("pending", "accepted", "declined")},
+            "mentorships": {key: mentorship_counts.get(key, 0) for key in ("pending", "accepted", "declined", "completed")},
+            "match_feedback": {"count": feedback_count, "average_rating": round(float(feedback_avg), 2) if feedback_avg is not None else None},
             "published_resources": published,
             "draft_resources": drafts,
             "knowledge_engagement": None,

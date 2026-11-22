@@ -72,6 +72,7 @@ export default function AdminOperationsPage() {
           <article><span className="admin-ops-summary-icon tone-violet"><Handshake size={17} /></span><span><strong>{loading ? "—" : mentorships.total}</strong><small>Mentorship requests</small></span></article>
           <article><span className="admin-ops-summary-icon tone-amber"><Flag size={17} /></span><span><strong>{loading ? "—" : openReports}</strong><small>Open member reports</small></span></article>
           <article><span className="admin-ops-summary-icon tone-blue"><Activity size={17} /></span><span><strong>{loading ? "—" : pendingMentorships}</strong><small>Pending mentorship requests</small></span></article>
+          <article><span className="admin-ops-summary-icon tone-green"><ShieldCheck size={17} /></span><span><strong>{loading ? "—" : (metrics?.match_feedback?.average_rating ?? "—")}</strong><small>Match rating ({metrics?.match_feedback?.count ?? 0} responses)</small></span></article>
         </section>
 
         <section className="admin-ops-workspace">

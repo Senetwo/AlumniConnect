@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from app.core.dependencies import get_current_user
 from app.api.profiles import get_db
 from app.models.notifications import Notification
+from app.services.reminders import generate_reminders
 
 router = APIRouter(prefix="/api/notifications", tags=["Notifications"])
 
@@ -34,6 +35,7 @@ def get_notifications(
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user),
 ):
+    generate_reminders(db, current_user)
     return (
         db.query(Notification)
         .filter(Notification.user_id == current_user.id)
@@ -48,6 +50,7 @@ def get_unread_count(
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user),
 ):
+    generate_reminders(db, current_user)
     count = (
         db.query(Notification)
         .filter(

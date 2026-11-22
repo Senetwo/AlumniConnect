@@ -6,6 +6,7 @@ from sqlalchemy import or_, and_
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_current_user, get_db, require_role
+from app.ml.knowledge_index_service import knowledge_index_service
 from app.models.network import ConnectionRequest, UserBlock, UserReport, NetworkMessage, Announcement
 from app.models.profile import Profile
 from app.models.user import User
@@ -278,6 +279,7 @@ def create_announcement(data: AnnouncementCreate, current: User = Depends(requir
     db.bulk_save_objects([Notification(user_id=member.id, type="announcement", title=announcement.title, message=announcement.body, resource_type="announcement", resource_id=announcement.id) for member in members])
     db.commit()
     db.refresh(announcement)
+    knowledge_index_service.sync_announcement(announcement)
     return {"id": announcement.id, "title": announcement.title, "body": announcement.body, "created_at": announcement.created_at, "recipient_count": len(members)}
 
 

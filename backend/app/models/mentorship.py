@@ -21,7 +21,7 @@ class Mentorship(Base):
 
     __table_args__ = (
         CheckConstraint(
-            "status IN ('pending', 'accepted', 'declined')",
+            "status IN ('pending', 'accepted', 'declined', 'completed')",
             name="check_mentorship_status",
         ),
         Index(
@@ -68,6 +68,12 @@ class Mentorship(Base):
         DateTime(timezone=True),
         nullable=True,
     )
+
+    # Set when an accepted mentorship is closed. Sessions, notes, goals and action
+    # items are kept; the row only changes status.
+    closed_at = Column(DateTime(timezone=True), nullable=True)
+    closed_by_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    outcome_summary = Column(Text, nullable=True)
 
     mentee = relationship("User", foreign_keys=[mentee_id])
     mentor = relationship("User", foreign_keys=[mentor_id])

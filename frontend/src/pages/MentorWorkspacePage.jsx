@@ -6,14 +6,16 @@ import { DateTile, FilterTabs, PageHeader, StatCard } from "../components/dashbo
 import { apiRequest } from "../services/api";
 import { getAuth } from "../services/authStorage";
 import { formatDay, formatEventDate, initials } from "../utils/format";
+import WorkspaceGlance from "../components/WorkspaceGlance";
 
-const filters = ["pending", "accepted", "declined", "all"];
+const filters = ["pending", "accepted", "completed", "declined", "all"];
 
 export default function MentorWorkspacePage() {
   const firstName = getAuth()?.user?.full_name?.split(" ")[0] || "";
   const [requests, setRequests] = useState([]);
   const [sessions, setSessions] = useState([]);
   const [openSlots, setOpenSlots] = useState(0);
+  const [summary, setSummary] = useState({});
   const [chosenFilter, setFilter] = useState(null);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
@@ -24,12 +26,14 @@ export default function MentorWorkspacePage() {
   const loadAll = useCallback(async () => {
     setLoading(true); setError("");
     try {
-      const [incoming, bookings, availability] = await Promise.all([
+      const [incoming, bookings, availability, progress] = await Promise.all([
         apiRequest("/api/mentorships/incoming"),
         apiRequest("/api/bookings/me").catch(() => []),
         apiRequest("/api/availability/me").catch(() => []),
+        apiRequest("/api/mentorships/summary").catch(() => ({})),
       ]);
       setRequests(incoming);
+      setSummary(progress);
       setSessions(bookings
         .filter((booking) => booking.status === "confirmed" && booking.start_at && new Date(booking.start_at) >= new Date())
         .sort((a, b) => new Date(a.start_at) - new Date(b.start_at)));
@@ -44,6 +48,7 @@ export default function MentorWorkspacePage() {
     all: requests.length,
     pending: requests.filter((item) => item.status === "pending").length,
     accepted: requests.filter((item) => item.status === "accepted").length,
+    completed: requests.filter((item) => item.status === "completed").length,
     declined: requests.filter((item) => item.status === "declined").length,
   }), [requests]);
 
@@ -122,9 +127,11 @@ export default function MentorWorkspacePage() {
                 <button className="btn btn-outline" type="button" disabled={processing === request.id} onClick={() => respond(request.id, "declined")}><X size={16} aria-hidden="true" />Decline</button>
               </div>
             )}
-            {request.status === "accepted" && (
+            {summary[request.id] && <WorkspaceGlance info={summary[request.id]} />}
+            {(request.status === "accepted" || request.status === "completed") && (
               <div className="pg-actions">
-                <Link to="/chats" className="btn btn-outline">Message {request.mentee_name?.split(" ")[0]}</Link>
+                <Link to={`/mentorships/${request.id}`} className="btn btn-primary">Open workspace</Link>
+                <Link to="/chats" className="btn btn-outline">{request.status === "completed" ? "View messages" : `Message ${request.mentee_name?.split(" ")[0]}`}</Link>
                 <Link to="/booking" className="btn btn-outline">View sessions</Link>
               </div>
             )}

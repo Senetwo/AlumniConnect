@@ -73,3 +73,8 @@
 /* Card actions: View profile beside the next step, which wraps below when long. */
 .mentor-card-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; }
 .mentor-card-actions .request-state { flex: 1 1 240px; }
+
+/* Why a mentor was suggested: descriptive overlap, not the ranking itself. */
+.match-reasons { display: grid; gap: 4px; margin: 4px 0 0; padding: 10px 12px; list-style: none; border-radius: 10px; background: #f1faf4; font-size: var(--text-xs); color: #0b6b34; }
+.match-reasons li { position: relative; padding-left: 16px; font-weight: 600; }
+.match-reasons li::before { content: "✓"; position: absolute; left: 0; font-weight: 800; }

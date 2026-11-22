@@ -5,7 +5,7 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 
-MentorshipStatus = Literal["pending", "accepted", "declined"]
+MentorshipStatus = Literal["pending", "accepted", "declined", "completed"]
 MentorshipDecision = Literal["accepted", "declined"]
 
 

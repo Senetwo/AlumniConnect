@@ -5,6 +5,7 @@ from app.core.dependencies import get_current_user, get_db, community_role
 from app.models.profile import Profile
 from app.models.user import User
 from app.ml.matching_service import matching_service
+from app.services.match_explanation import explain_match
 
 router = APIRouter(prefix="/api/matches", tags=["Matches"])
 
@@ -58,7 +59,9 @@ def build_matches(
             "similarity_score": round(
                 candidate["similarity"] * 100,
                 2
-            )
+            ),
+            # Additive and descriptive only; ranking comes from the similarity above.
+            "match_reasons": explain_match(mentee, mentor),
         })
 
     return matches

@@ -2725,6 +2725,11 @@
   color: #ececef;
 }
 
+:root[data-theme="dark"] .match-reasons {
+  background: #26262b;
+  color: #ececef;
+}
+
 /* from styles/content.css */
 :root[data-theme="dark"] .profile-avatar-preview {
   background: #3b3b42;
@@ -2963,6 +2968,184 @@
   color: #ececef;
 }
 
+/* from styles/workspace.css */
+:root[data-theme="dark"] .ws-tabs a {
+  color: #ececef;
+}
+
+:root[data-theme="dark"] .ws-block h2,
+:root[data-theme="dark"] .ws-block h3,
+:root[data-theme="dark"] .ws-close h2,
+:root[data-theme="dark"] .ws-attention h2,
+:root[data-theme="dark"] .ws-closed h2 {
+  color: #ececef;
+}
+
+:root[data-theme="dark"] .ws-row h3 {
+  color: #ececef;
+}
+
+:root[data-theme="dark"] .ws-session-head h2 {
+  color: #ececef;
+}
+
+:root[data-theme="dark"] .ws-closed {
+  background: #26262b;
+}
+
+:root[data-theme="dark"] .ws-closed > svg {
+  color: #ececef;
+}
+
+:root[data-theme="dark"] .ws-chip {
+  color: #ececef;
+}
+
+:root[data-theme="dark"] .ws-chip.is-completed,
+:root[data-theme="dark"] .ws-chip.is-accepted,
+:root[data-theme="dark"] .ws-chip.is-shared {
+  background: #2f2f35;
+  border-color: #37373d;
+  color: #ececef;
+}
+
+:root[data-theme="dark"] .ws-chip.is-scheduled,
+:root[data-theme="dark"] .ws-chip.is-in_progress {
+  background: #26262b;
+  border-color: #37373d;
+  color: #a7a7ae;
+}
+
+:root[data-theme="dark"] .ws-chip.is-on_hold,
+:root[data-theme="dark"] .ws-chip.is-not_started {
+  background: #2f2f35;
+  border-color: #37373d;
+  color: #ececef;
+}
+
+:root[data-theme="dark"] .ws-chip.is-cancelled {
+  background: rgba(226, 7, 20, 0.16);
+  border-color: #37373d;
+}
+
+:root[data-theme="dark"] .ws-chip.is-private {
+  background: #26262b;
+  border-color: #37373d;
+  color: #a7a7ae;
+}
+
+:root[data-theme="dark"] .pg-chip.is-completed {
+  background: #2f2f35;
+  border-color: #37373d;
+  color: #ececef;
+}
+
+:root[data-theme="dark"] .ws-checklist label {
+  color: #ececef;
+}
+
+:root[data-theme="dark"] .ws-inline-select select {
+  color: #ececef;
+}
+
+:root[data-theme="dark"] .ws-danger:hover {
+  background: rgba(226, 7, 20, 0.16);
+}
+
+:root[data-theme="dark"] .ws-note-body dd {
+  color: #ececef;
+}
+
+:root[data-theme="dark"] .ws-visibility legend {
+  color: #ececef;
+}
+
+:root[data-theme="dark"] .ws-visibility strong {
+  color: #ececef;
+}
+
+:root[data-theme="dark"] .ws-timeline strong {
+  color: #ececef;
+}
+
+:root[data-theme="dark"] .ws-modal h2 {
+  color: #ececef;
+}
+
+:root[data-theme="dark"] .ws-modal .register-field label {
+  color: #ececef;
+}
+
+:root[data-theme="dark"] .ws-modal input:not([type="checkbox"]):not([type="radio"]),
+:root[data-theme="dark"] .ws-modal select,
+:root[data-theme="dark"] .ws-modal textarea {
+  color: #ececef;
+}
+
+:root[data-theme="dark"] .ws-icon-button {
+  color: #ececef;
+}
+
+:root[data-theme="dark"] .ws-tab-count {
+  color: #ececef;
+}
+
+:root[data-theme="dark"] .ws-tabs a.is-active .ws-tab-count {
+  background: rgba(29, 29, 33, 0.25);
+}
+
+:root[data-theme="dark"] .ws-party small.is-mentor {
+  background: #26262b;
+  color: #a7a7ae;
+}
+
+:root[data-theme="dark"] .ws-party small.is-mentee {
+  background: #26262b;
+  color: #a7a7ae;
+}
+
+:root[data-theme="dark"] .ws-plain-list li.ws-alert-item {
+  color: #ececef;
+}
+
+:root[data-theme="dark"] .ws-plain-list li.ws-alert-item svg {
+  color: #a7a7ae;
+}
+
+:root[data-theme="dark"] .ws-attention {
+  border-color: #37373d;
+  background: #26262b;
+}
+
+:root[data-theme="dark"] .ws-attention h2 {
+  color: #ececef;
+}
+
+:root[data-theme="dark"] .ws-feedback {
+  border-color: #37373d;
+  background: #26262b;
+}
+
+:root[data-theme="dark"] .ws-feedback h2 {
+  color: #ececef;
+}
+
+:root[data-theme="dark"] .ws-stars label.is-on {
+  color: #a7a7ae;
+}
+
+@media print {
+:root[data-theme="dark"] body,
+:root[data-theme="dark"] .app,
+:root[data-theme="dark"] .pg-page {
+  background: #1d1d21 !important;
+}
+
+:root[data-theme="dark"] .pg-card {
+  border-color: #37373d;
+}
+}
+
 /* from styles/admin.css */
 :root[data-theme="dark"] .admin-dashboard-heading h1,
 :root[data-theme="dark"] .admin-tool-heading h1,
@@ -3065,14 +3248,78 @@
   color: #a7a7ae;
 }
 
+:root[data-theme="dark"] .admin-status-pill.status-completed {
+  background: #2f2f35;
+  color: #ececef;
+}
+
 /* from styles/vibrance.css */
 :root[data-theme="dark"] .pg-tabs button.is-active span,
 :root[data-theme="dark"] .admin-ops-tabs button.is-selected .admin-tab-count {
   background: #1d1d21;
 }
 
+:root[data-theme="dark"] .calendar-legend span {
+  color: #ececef;
+}
+
+:root[data-theme="dark"] .availability-slot-item.is-available {
+  background: #26262b;
+  border-color: #37373d;
+}
+
+:root[data-theme="dark"] .availability-slot-item.is-booked {
+  background: #26262b;
+  border-color: #37373d;
+}
+
+:root[data-theme="dark"] .availability-slot-item.is-booked a {
+  color: #a7a7ae;
+}
+
+:root[data-theme="dark"] .availability-slot-item.is-available small {
+  color: #ececef;
+}
+
+:root[data-theme="dark"] .availability-slot-item.is-booked small {
+  color: #a7a7ae;
+}
+
+:root[data-theme="dark"] .pg-chip.is-confirmed {
+  background: #26262b;
+  border-color: #37373d;
+  color: #a7a7ae;
+}
+
 
 /* Hand-written dark rules for things the generator cannot infer. */
+:root[data-theme="dark"] .available-marker { background: #4ade80; }
+:root[data-theme="dark"] .booked-marker { background: #60a5fa; }
+:root[data-theme="dark"] .calendar-legend span { color: #d7d7dc; }
+:root[data-theme="dark"] .ws-chip.is-completed, :root[data-theme="dark"] .ws-chip.is-accepted, :root[data-theme="dark"] .ws-chip.is-shared { background: rgba(74, 222, 128, 0.14); border-color: rgba(74, 222, 128, 0.4); color: #86efac; }
+:root[data-theme="dark"] .ws-chip.is-scheduled, :root[data-theme="dark"] .ws-chip.is-in_progress { background: rgba(96, 165, 250, 0.16); border-color: rgba(96, 165, 250, 0.4); color: #93c5fd; }
+:root[data-theme="dark"] .ws-chip.is-on_hold, :root[data-theme="dark"] .ws-chip.is-not_started { background: rgba(251, 191, 36, 0.14); border-color: rgba(251, 191, 36, 0.4); color: #fcd34d; }
+:root[data-theme="dark"] .ws-chip.is-cancelled { background: rgba(248, 113, 113, 0.14); border-color: rgba(248, 113, 113, 0.4); color: #fca5a5; }
+:root[data-theme="dark"] .ws-chip.is-private { background: rgba(167, 139, 250, 0.16); border-color: rgba(167, 139, 250, 0.4); color: #c4b5fd; }
+:root[data-theme="dark"] .ws-party small.is-mentor { background: rgba(96, 165, 250, 0.16); color: #93c5fd; }
+:root[data-theme="dark"] .ws-party small.is-mentee { background: rgba(167, 139, 250, 0.16); color: #c4b5fd; }
+:root[data-theme="dark"] .ws-attention { background: rgba(251, 191, 36, 0.08); border-color: rgba(251, 191, 36, 0.35); border-left-color: #d97706; }
+:root[data-theme="dark"] .ws-attention h2 { color: #fcd34d; }
+:root[data-theme="dark"] .ws-plain-list li.ws-alert-item { color: #fcd34d; }
+:root[data-theme="dark"] .ws-closed { background: rgba(74, 222, 128, 0.08); border-color: rgba(74, 222, 128, 0.4); }
+:root[data-theme="dark"] .ws-tab-count { background: #2a2a31; color: #ececef; }
+
+:root[data-theme="dark"] .admin-status-pill.status-completed { background: rgba(74, 222, 128, 0.14); color: #86efac; }
+:root[data-theme="dark"] .ws-feedback { background: rgba(74, 222, 128, 0.08); border-color: rgba(74, 222, 128, 0.35); }
+:root[data-theme="dark"] .ws-glance li.is-late { color: #fca5a5; }
+:root[data-theme="dark"] .match-reasons { background: rgba(74, 222, 128, 0.10); color: #86efac; }
+:root[data-theme="dark"] .pg-chip.is-confirmed { background: rgba(96, 165, 250, 0.16); border-color: rgba(96, 165, 250, 0.4); color: #93c5fd; }
+:root[data-theme="dark"] .availability-slot-item.is-available { background: rgba(74, 222, 128, 0.10); border-color: rgba(74, 222, 128, 0.35); }
+:root[data-theme="dark"] .availability-slot-item.is-available .availability-slot-indicator { background: #4ade80; }
+:root[data-theme="dark"] .availability-slot-item.is-available small { color: #86efac; }
+:root[data-theme="dark"] .availability-slot-item.is-booked { background: rgba(96, 165, 250, 0.12); border-color: rgba(96, 165, 250, 0.38); }
+:root[data-theme="dark"] .availability-slot-item.is-booked .availability-slot-indicator { background: #60a5fa; }
+:root[data-theme="dark"] .availability-slot-item.is-booked small, :root[data-theme="dark"] .availability-slot-item.is-booked a { color: #93c5fd; }
 :root[data-theme="dark"] body { background: #121214; color: #ececef; }
 :root[data-theme="dark"] input::placeholder, :root[data-theme="dark"] textarea::placeholder { color: #7c7c85; }
 :root[data-theme="dark"] input, :root[data-theme="dark"] select, :root[data-theme="dark"] textarea { background-color: #1d1d21; color: #ececef; border-color: #45454c; }

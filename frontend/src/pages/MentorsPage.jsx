@@ -181,6 +181,12 @@ export default function MentorsPage() {
                     {mentor.availability && <span>Available: {mentor.availability}</span>}
                   </div>
 
+                  {mentor.match_reasons?.length > 0 && (
+                    <ul className="match-reasons" aria-label="Why this mentor was suggested">
+                      {mentor.match_reasons.map((reason) => <li key={reason}>{reason}</li>)}
+                    </ul>
+                  )}
+
                   {skills.length > 0 && (
                     <div className="competencies" aria-label="Areas of expertise">
                       {skills.slice(0, 3).map((skill) => <span key={skill}>{skill}</span>)}

@@ -12,6 +12,7 @@ import "./styles/mentors.css";
 import "./styles/content.css";
 import "./styles/chats.css";
 import "./styles/dashboard.css";
+import "./styles/workspace.css";
 import "./styles/admin.css";
 import "./styles/vibrance.css";
 import "./styles/dark.css";

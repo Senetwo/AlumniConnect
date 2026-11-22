@@ -1,16 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { CalendarClock, Check, Clock, Compass, MessageCircle, Send, X } from "lucide-react";
+import { CalendarClock, Check, Clock, Compass, LayoutDashboard, MessageCircle, Send, X } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { DateTile, FilterTabs, PageHeader, StatCard } from "../components/dashboard";
 import { apiRequest } from "../services/api";
 import { formatDay, formatEventDate, initials, timeAgo } from "../utils/format";
+import WorkspaceGlance from "../components/WorkspaceGlance";
 
-const tabs = ["all", "pending", "accepted", "declined"];
+const tabs = ["all", "pending", "accepted", "completed", "declined"];
 
 export default function MyMentorshipsPage() {
   const [requests, setRequests] = useState([]);
   const [nextSession, setNextSession] = useState(null);
+  const [summary, setSummary] = useState({});
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -20,9 +22,11 @@ export default function MyMentorshipsPage() {
     Promise.all([
       apiRequest("/api/mentorships/outgoing"),
       apiRequest("/api/bookings/me").catch(() => []),
-    ]).then(([outgoing, bookings]) => {
+      apiRequest("/api/mentorships/summary").catch(() => ({})),
+    ]).then(([outgoing, bookings, progress]) => {
       if (!active) return;
       setRequests(outgoing);
+      setSummary(progress);
       const upcoming = bookings
         .filter((booking) => booking.status === "confirmed" && booking.start_at && new Date(booking.start_at) >= new Date())
         .sort((a, b) => new Date(a.start_at) - new Date(b.start_at));
@@ -37,6 +41,7 @@ export default function MyMentorshipsPage() {
     all: requests.length,
     pending: requests.filter((item) => item.status === "pending").length,
     accepted: requests.filter((item) => item.status === "accepted").length,
+    completed: requests.filter((item) => item.status === "completed").length,
     declined: requests.filter((item) => item.status === "declined").length,
   }), [requests]);
   const visible = requests.filter((item) => filter === "all" || item.status === filter);
@@ -109,10 +114,12 @@ export default function MyMentorshipsPage() {
                   <span>Your message</span>
                   <p>{request.motivation || "No message was included with this request."}</p>
                 </blockquote>
-                {request.status === "accepted" && (
+                {summary[request.id] && <WorkspaceGlance info={summary[request.id]} />}
+                {(request.status === "accepted" || request.status === "completed") && (
                   <div className="pg-actions">
-                    <Link to="/booking" className="btn btn-primary"><CalendarClock size={16} aria-hidden="true" />Book a session</Link>
-                    <Link to="/chats" className="btn btn-outline"><MessageCircle size={16} aria-hidden="true" />Message</Link>
+                    <Link to={`/mentorships/${request.id}`} className="btn btn-primary"><LayoutDashboard size={16} aria-hidden="true" />Open workspace</Link>
+                    {request.status === "accepted" && <Link to="/booking" className="btn btn-outline"><CalendarClock size={16} aria-hidden="true" />Book a session</Link>}
+                    <Link to="/chats" className="btn btn-outline"><MessageCircle size={16} aria-hidden="true" />{request.status === "completed" ? "View messages" : "Message"}</Link>
                   </div>
                 )}
                 {request.status === "pending" && <p className="pg-note"><Clock size={15} aria-hidden="true" />Waiting for {request.mentor_name?.split(" ")[0] || "the mentor"} to respond. You will be notified.</p>}

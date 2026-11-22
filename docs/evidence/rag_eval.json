@@ -1,0 +1,42 @@
+{
+  "floor": 0.25,
+  "skipped": {},
+  "results": {
+    "substring": {
+      "hit@1": 0.0,
+      "hit@3": 0.0,
+      "mrr": 0.08333333333333333,
+      "answerable_above_floor": 0.0,
+      "declined_out_of_library": 1.0,
+      "min_gold_score": 0.0,
+      "max_out_of_library_score": 0.0
+    },
+    "tfidf-keyword": {
+      "hit@1": 0.5,
+      "hit@3": 0.7916666666666666,
+      "mrr": 0.6638888888888889,
+      "answerable_above_floor": 0.375,
+      "declined_out_of_library": 0.16666666666666666,
+      "min_gold_score": 0.0,
+      "max_out_of_library_score": 0.426
+    },
+    "base-minilm": {
+      "hit@1": 1.0,
+      "hit@3": 1.0,
+      "mrr": 1.0,
+      "answerable_above_floor": 1.0,
+      "declined_out_of_library": 1.0,
+      "min_gold_score": 0.408,
+      "max_out_of_library_score": 0.221
+    },
+    "fine-tuned": {
+      "hit@1": 0.9583333333333334,
+      "hit@3": 1.0,
+      "mrr": 0.9791666666666666,
+      "answerable_above_floor": 1.0,
+      "declined_out_of_library": 1.0,
+      "min_gold_score": 0.449,
+      "max_out_of_library_score": 0.173
+    }
+  }
+}

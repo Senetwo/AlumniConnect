@@ -56,6 +56,7 @@ export default function ChatsPage() {
       preview: chat.latest_message || "Start your conversation",
       at: chat.latest_message_at || chat.created_at,
       unread: chat.unread_count || 0,
+      closed: chat.mentorship_status === "completed",
     })).sort((a, b) => new Date(b.at) - new Date(a.at));
     const community = connections.map((connection) => ({
       key: `c-${connection.id}`,
@@ -267,6 +268,9 @@ export default function ChatsPage() {
                     })}
                   </div>
 
+                  {selected.closed ? (
+                    <p className="ch-closed" role="status">This mentorship is completed. You can read the conversation, but new messages are turned off.</p>
+                  ) : (
                   <form className="ch-compose" onSubmit={send}>
                     <label className="visually-hidden" htmlFor="ch-message">Message</label>
                     <textarea
@@ -284,6 +288,7 @@ export default function ChatsPage() {
                       <Send size={17} aria-hidden="true" /><span>{sending ? "Sending…" : "Send"}</span>
                     </button>
                   </form>
+                  )}
                 </>
               )}
             </section>

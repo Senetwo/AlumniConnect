@@ -8,6 +8,8 @@ from sqlalchemy.orm import Session
 from app.core.dependencies import get_current_user, get_db, community_role
 from app.models.booking import Booking, MentorAvailability
 from app.models.mentorship import Mentorship
+from app.api.workspace import as_utc
+from app.models.workspace import MentorshipActivityEvent, MentorshipSession
 from app.models.user import User
 from app.models.notifications import Notification
 from app.schemas.booking import (
@@ -19,6 +21,30 @@ from app.schemas.booking import (
 from app.services.notification_service import create_notification
 
 router = APIRouter(prefix="/api", tags=["Bookings"])
+
+
+def sync_session_for_booking(db, booking, slot, mentorship, actor) -> None:
+    """A confirmed booking is also a mentorship session, so the workspace shows it."""
+    minutes = max(5, min(480, int((slot.end_at - slot.start_at).total_seconds() // 60)))
+    session = db.query(MentorshipSession).filter(MentorshipSession.booking_id == booking.id).first()
+    if session is None:
+        session = MentorshipSession(
+            mentorship_id=mentorship.id, created_by_id=actor.id, booking_id=booking.id,
+            title="Mentoring session", scheduled_at=slot.start_at, duration_minutes=minutes,
+            meeting_type="virtual", status="scheduled",
+        )
+        db.add(session)
+    else:  # the same slot was booked again after an earlier cancellation
+        session.mentorship_id = mentorship.id
+        session.scheduled_at = slot.start_at
+        session.duration_minutes = minutes
+        session.status = "scheduled"
+        session.cancel_reason = None
+    db.flush()
+    db.add(MentorshipActivityEvent(
+        mentorship_id=mentorship.id, actor_id=actor.id, event_type="session_scheduled",
+        entity_type="session", entity_id=session.id, summary=f"Session scheduled: {session.title}",
+    ))
 
 
 @router.post(
@@ -179,7 +205,7 @@ def create_booking(
             detail="This availability slot is no longer available.",
         )
 
-    if slot.start_at <= datetime.now(timezone.utc):
+    if as_utc(slot.start_at) <= datetime.now(timezone.utc):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="This availability slot has already started.",
@@ -204,6 +230,7 @@ def create_booking(
         if booking.id is None:
             db.add(booking)
         db.flush()
+        sync_session_for_booking(db, booking, slot, mentorship, current_user)
         db.add(Notification(
             user_id=slot.mentor_id,
             type="booking_created",
@@ -320,7 +347,7 @@ def cancel_booking(
             detail="The associated availability slot was not found.",
         )
 
-    if slot.start_at <= datetime.now(timezone.utc):
+    if as_utc(slot.start_at) <= datetime.now(timezone.utc):
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="A session that has already started cannot be cancelled.",
@@ -328,7 +355,16 @@ def cancel_booking(
 
     booking.status = "cancelled"
     slot.status = "available"
-    
+    linked = db.query(MentorshipSession).filter(MentorshipSession.booking_id == booking.id).first()
+    if linked is not None and linked.status == "scheduled":
+        linked.status = "cancelled"
+        linked.cancel_reason = "Booking cancelled"
+        db.add(MentorshipActivityEvent(
+            mentorship_id=booking.mentorship_id, actor_id=current_user.id, event_type="session_cancelled",
+            entity_type="session", entity_id=linked.id, summary=f"Session cancelled: {linked.title}",
+            old_value="scheduled", new_value="cancelled",
+        ))
+
     recipient_id = (
     slot.mentor_id
     if booking.mentee_id == current_user.id
