@@ -1,306 +1,201 @@
-AlumniConnect
+# AlumniConnect
 
-An Intelligent Alumni Engagement and Mentorship Platform
+A mentorship and networking platform for alumni. Members build a profile, get semantically ranked mentor suggestions, request mentorship, book sessions, work together in a shared mentorship workspace, chat, and use the Knowledge Hub. Administrators manage users, moderation, and published resources.
 
-AlumniConnect is a web-based platform for strengthening alumni engagement, facilitating professional mentorship, and supporting knowledge sharing within the Kenya Airways alumni community.
+AlumniConnect supports professional connections across aviation, engineering, technology, commercial operations, finance, human resources, and other career areas. Its goal is to make alumni mentorship easier to discover, organize, and sustain.
 
-The platform uses semantic matching with Sentence-BERT embeddings to recommend mentors based on career interests, professional experience, skills, and mentorship goals.
+The project objectives are to provide secure accounts and professional profiles, recommend relevant mentors, support the request and acceptance workflow, help participants organize an ongoing mentorship, and make professional knowledge easier to find and share.
 
-⸻
+## Architecture
 
-📌 Project Overview
+The React and Vite frontend uses a FastAPI backend, SQLAlchemy with PostgreSQL for application data, and ChromaDB for semantic indexes. Mentor recommendations encode mentee and mentor profiles with the fine-tuned Sentence-Transformers model, retrieve candidates from ChromaDB, and rank them by cosine similarity. The Knowledge Hub uses the same embedding service to retrieve published resources for Ask the library.
 
-Traditional alumni networks often lack structured ways to connect professionals with suitable mentors. AlumniConnect addresses this gap through an intelligent recommendation system and a centralized professional networking platform.
+The main workflow is: a member creates a profile, receives ranked mentor suggestions, requests mentorship, and—after acceptance—uses a shared workspace to plan sessions, record notes, set goals, and track action items. The project also includes community, messaging, moderation, and knowledge-resource features.
 
-The system is designed to support alumni across multiple career domains, including aviation, engineering, technology, commercial operations, finance, human resources, and other professional fields.
+## Features
 
-🎯 Objectives
+- **Accounts:** registration, email verification, password login with emailed one-time code, password reset, optional Clerk sign-in
+- **Profiles:** career domain, skills, goals, availability, picture upload, directory visibility
+- **Mentor matching:** Sentence-Transformers embeddings stored in ChromaDB, ranked by cosine similarity
+- **Mentorship:** requests, accept/decline, availability slots, bookings, per-mentorship chat, and notifications
+- **Mentorship workspace:** schedule sessions, keep shared or private notes, set goals and action items, track progress, and close a mentorship with an optional outcome summary. Completed workspaces remain available as read-only records.
+- **Networking and content:** connections, community feed, and a curated Knowledge Hub
+- **Ask the library:** semantic search over published Knowledge Hub resources, with answers grounded in retrieved passages and source links. When the library does not contain enough information, the assistant says so rather than guessing.
+- **Feedback and reminders:** private post-mentorship feedback, plus notifications for upcoming sessions and overdue action items
+- **Administration:** role-protected admin APIs and pages, audited one-time admin bootstrap
 
-* Provide secure registration and authentication for mentors and mentees.
-* Enable users to create and maintain professional profiles.
-* Recommend suitable mentors using semantic similarity.
-* Allow mentees to submit mentorship requests.
-* Enable mentors to accept or decline incoming requests.
-* Support future knowledge-sharing and alumni-engagement features.
+These are implemented application capabilities. The project has not been deployed to production.
 
-⸻
+## Repository layout
 
-🛠️ Technology Stack
+| Path | Contents |
+|---|---|
+| `backend/` | FastAPI app (`app/api`, `app/models`, `app/schemas`, `app/services`, `app/ml`), tests in `backend/tests` |
+| `frontend/` | React 19 + Vite client |
+| `infrastructure/` | `docker-compose.yml` for a local PostgreSQL |
+| `data/` | Data notes (see `data/README.md`) |
+| `docs/` | Design notes and the Chapters 4-6 draft |
+| `.github/workflows/ci.yml` | CI: backend tests, frontend lint and build |
 
-Layer	Technology
-Frontend	React, Vite, JavaScript, HTML, CSS
-Backend	Python, FastAPI
-Database	PostgreSQL
-ORM	SQLAlchemy
-Machine Learning	Sentence-BERT, Sentence Transformers
-Vector Database	ChromaDB
-Authentication	JWT, role-based access control
-Testing	Pytest, FastAPI TestClient
-Development Tools	VS Code, Git, GitHub, Docker
+## Technology
 
-⸻
+| Layer | Tools |
+|---|---|
+| Frontend | React 19, Vite, JavaScript |
+| Backend | Python 3.13, FastAPI, SQLAlchemy |
+| Data | PostgreSQL, ChromaDB |
+| Matching | Sentence-Transformers, PyTorch |
+| Authentication | JWT, role-based access control, optional Clerk |
+| CI | GitHub Actions, Pytest, ESLint, Vite build |
 
-🏗️ System Architecture
+## Prerequisites
 
-AlumniConnect uses a modular architecture with the following layers:
+- Python 3.13, Node.js 22, Git
+- PostgreSQL 16 (via Docker below) or any SQLAlchemy-supported database URL
+- Git LFS for the fine-tuned Sentence-Transformers model used for mentor matching and Knowledge Hub retrieval
+- An LLM API key for generated Ask the library answers (`LLM_API_KEY`); without it, resource browsing remains available but generated answers are not
 
-1. Presentation layer: React-based user interface.
-2. Application layer: FastAPI REST endpoints for authentication, profiles, matching, and mentorship workflows.
-3. Data layer: PostgreSQL for structured records and ChromaDB for vector embeddings.
-4. Machine learning layer: Sentence-BERT embeddings and similarity-based mentor recommendations.
+## Setup
 
-Mentor Recommendation Workflow
+1. **Configuration.** Copy `.env.example` to `.env` in the repository root and fill it in. Never commit `.env`.
+   - `DATABASE_URL`, e.g. `postgresql+psycopg://alumniconnect:alumniconnect_dev@localhost:5432/alumniconnect`
+   - `SECRET_KEY`: generate with `python -c "import secrets; print(secrets.token_urlsafe(48))"`
+   - `EMBEDDING_MODEL`: model folder path (the example defaults to `./backend/ml_models/alumniconnect_sbert_finetuned`); `CHROMA_PERSIST_DIRECTORY`: vector store folder
+   - `LLM_API_KEY`: provider API key for Ask the library; `LLM_MODEL`, `RAG_TOP_K`, and `RAG_MIN_SIMILARITY` optionally configure answer generation and retrieval
+   - SMTP settings for email (see `backend/EMAIL_AND_SOCIAL_LOGIN_SETUP.md`); Clerk keys are optional (see `docs/clerk-authentication.md`)
+   - Frontend: optionally create `frontend/.env.local` with `VITE_API_BASE_URL` (default `http://127.0.0.1:8000`) and `VITE_CLERK_PUBLISHABLE_KEY`
+2. **Database** (optional, local Postgres):
+   ```powershell
+   docker compose -f infrastructure/docker-compose.yml up -d
+   ```
+3. **Backend:**
+   ```powershell
+   cd backend
+   python -m venv .venv
+   .\.venv\Scripts\python.exe -m pip install -r requirements.txt
+   ```
+4. **Frontend:**
+   ```powershell
+   cd frontend
+   npm ci
+   ```
 
-1. A user registers and completes a professional profile.
-2. Relevant profile information is prepared for semantic analysis.
-3. The system generates embeddings using a fine-tuned Sentence-BERT model.
-4. Mentor embeddings are stored and retrieved through ChromaDB.
-5. Candidate mentors are ranked by semantic similarity.
-6. The mentee receives recommendations and can submit mentorship requests.
+The fine-tuned model is versioned with Git LFS. If a clone contains an LFS pointer instead of the model files, install Git LFS and run `git lfs pull` from the repository root. If you cannot access the LFS object, obtain the complete fine-tuned model directory separately and point `EMBEDDING_MODEL` to it. Other local model artifacts under `backend/ml_models/` are ignored by Git and must be supplied separately if needed.
 
-⸻
+## Run
 
-✨ Features
+```powershell
+# Backend (tables are created on startup) - from backend/
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --reload
 
-Implemented Backend Features
+# Optional demo mentors - from backend/
+.\.venv\Scripts\python.exe seed_mentors.py
 
-* User registration and login
-* JWT authentication
-* Role-based access control for mentors and mentees
-* Professional profile creation and updates
-* Semantic mentor recommendations
-* Mentor profile vector indexing and retrieval
-* Mentorship request creation
-* Retrieval of incoming mentorship requests
-* Mentorship request acceptance and rejection
+# Optional Knowledge Hub resources and semantic search index - from backend/
+.\.venv\Scripts\python.exe seed_knowledge.py
 
-Frontend Features
-
-* Responsive landing page
-* User registration and login
-* Mentor discovery interface
-* Mentorship request submission
-* Editable user profiles
-* Mentor Workspace for reviewing and responding to requests
-
-Planned Features
-
-* Knowledge Hub and shared professional resources
-* Notifications
-* Mentorship session scheduling
-* Direct messaging
-* Enhanced alumni community engagement
-* Administrative moderation and reporting
-
-Note: Planned features are not currently represented as completed functionality.
-
-⸻
-
-📁 Project Structure
-
-AlumniConnect/
-├── backend/
-│   ├── app/
-│   │   ├── api/
-│   │   ├── core/
-│   │   ├── database/
-│   │   ├── ml/
-│   │   ├── models/
-│   │   └── schemas/
-│   ├── ml_models/
-│   │   └── alumniconnect_sbert_finetuned/
-│   └── tests/
-├── frontend/
-│   ├── src/
-│   └── package.json
-├── .env
-└── README.md
-
-⸻
-
-🚀 Installation and Setup
-
-Prerequisites
-
-* Python 3.13
-* Node.js and npm
-* PostgreSQL
-* Docker, optionally for running PostgreSQL
-* Git
-
-1. Clone the Repository
-
-git clone https://github.com/Senetwo/AlumniConnect.git
-cd AlumniConnect
-
-The repository is private, so access is required to clone it.
-
-2. Configure the Backend
-
-Navigate to the backend directory and create a virtual environment:
-
-cd backend
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-
-Install the backend dependencies using the project’s dependency file, if available.
-
-Create a .env file in the repository root with the required configuration:
-
-APP_ENV=development
-BACKEND_HOST=127.0.0.1
-BACKEND_PORT=8000
-DATABASE_URL=postgresql+psycopg://USERNAME:PASSWORD@localhost:5432/DATABASE_NAME
-SECRET_KEY=REPLACE_WITH_A_SECURE_SECRET
-CHROMA_PERSIST_DIRECTORY=./chroma_data
-EMBEDDING_MODEL=./backend/ml_models/alumniconnect_sbert_finetuned
-LLM_API_KEY=
-
-Replace the placeholder credentials and secrets with local development values. Do not commit .env or production credentials.
-
-The fine-tuned embedding model must be available at the configured path.
-
-3. Start the Backend
-
-From the backend directory, run:
-
-uvicorn app.main:app --reload
-
-The API server will be available at:
-
-* API server: http://127.0.0.1:8000
-* Interactive API documentation: http://127.0.0.1:8000/docs
-
-4. Start the Frontend
-
-Open a separate terminal and run:
-
-cd frontend
-npm install
+# Frontend - from frontend/
 npm run dev
+```
 
-Open the application at:
+API docs: http://127.0.0.1:8000/docs. App: http://localhost:5173.
 
-http://localhost:5173
+The interactive API reference includes authentication, profiles, matching, mentorship, workspace, community, and administration endpoints. Protected routes require a valid authenticated session and apply role and ownership checks.
 
-⸻
+Common endpoints include:
 
-🔌 API Endpoints
+| Method | Endpoint | Purpose |
+|---|---|---|
+| `POST` | `/api/auth/register` | Register a member and profile |
+| `POST` | `/api/auth/login` | Start password sign-in; may require an emailed one-time code |
+| `POST` | `/api/auth/login/verify-otp` | Complete sign-in when one-time-code verification is enabled |
+| `GET` | `/api/auth/me` | Return the authenticated member |
+| `GET`, `PATCH` | `/api/profiles/me` | Read or update the member's profile |
+| `GET` | `/api/matches/me` | Retrieve ranked mentor recommendations |
+| `POST` | `/api/mentorships/` | Submit a mentorship request |
+| `GET` | `/api/mentorships/incoming` | List requests for the authenticated mentor |
+| `PATCH` | `/api/mentorships/{mentorship_id}/respond` | Accept or decline a request |
+| `GET` | `/api/mentorships/{mentorship_id}/workspace` | Open an accepted or completed mentorship workspace |
+| `POST` | `/api/knowledge/ask` | Ask a question grounded in published library resources |
 
-Method	Endpoint	Description
-POST	/api/auth/register	Register a new user
-POST	/api/auth/login	Authenticate a user
-GET	/api/auth/me	Retrieve the authenticated user
-GET	/api/profiles/me	Retrieve the current user’s profile
-PATCH	/api/profiles/me	Update the current user’s profile
-GET	/api/matches/me	Retrieve recommended mentors
-POST	/api/mentorships/	Submit a mentorship request
-GET	/api/mentorships/incoming	Retrieve a mentor’s incoming requests
-PATCH	/api/mentorships/{mentorship_id}/respond	Accept or decline a request
+The interactive API reference at `/docs` lists the remaining routes and request schemas.
 
-Protected endpoints require a valid JWT bearer token. Role-based authorization restricts access to the appropriate users.
+The backend creates new workspace tables and applies the additive workspace migration at startup. Restart the backend after pulling changes. Existing bookings are linked to workspace sessions during migration. Run `seed_knowledge.py` to add the curated starter resources and rebuild their semantic index; it is safe to run again.
 
-⸻
+The workspace is available from accepted mentorships under **My mentorships** or the mentor dashboard. Session bookings stay linked to their workspace sessions, and private notes are visible only to their author. See [`docs/mentorship-workspace.md`](docs/mentorship-workspace.md) for access rules, API routes, and migration details.
 
-🤖 Machine Learning Approach
+To create the first administrator, follow `backend/ADMIN_SETUP.md`.
 
-AlumniConnect uses Sentence-BERT to represent professional profile information as dense vector embeddings.
+## Test
 
-The recommendation process compares mentee profiles with indexed mentor profiles using semantic similarity.
+```powershell
+# Backend - from backend/
+.\.venv\Scripts\python.exe -m pytest -q
 
-Model Evaluation
+# Frontend - from frontend/
+npm run lint
+npm run build
+```
 
-The recommendation approach was evaluated using synthetic profile data and relevance-labelled mentor–mentee pairs.
+Backend tests use an in-memory SQLite database and do not touch your configured database. The same checks run in GitHub Actions on every push and pull request; the backend job uploads a JUnit report as an artifact.
 
-Evaluation metrics include:
+## Evidence and evaluation
 
-* Precision@5
-* Recall@5
-* Mean Reciprocal Rank (MRR)
-* F1@5
+```powershell
+# from backend/ (needs the model folder from EMBEDDING_MODEL; set DATABASE_URL and SECRET_KEY)
+.\.venv\Scripts\python.exe -m evaluation.eval_matching          # writes docs/evidence/matching_eval.md/.json
+.\.venv\Scripts\python.exe -m evaluation.eval_rag               # retrieval-only; no LLM calls
+.\.venv\Scripts\python.exe -m pytest -q -W ignore --junitxml=pytest-report.xml
+.\.venv\Scripts\python.exe -m evaluation.make_test_record pytest-report.xml ../docs/evidence/test_record.md
+```
 
-The evaluation compared TF-IDF, pretrained Sentence-BERT, and fine-tuned Sentence-BERT approaches.
+Results and discussion are in `docs/chapters-4-6-draft.md` (Chapter 5) and `docs/evidence/`. Workspace behavior and data model notes are in `docs/mentorship-workspace.md`.
 
-The fine-tuned model achieved the following results:
+### Mentor matching results
 
-Metric	Result
-Precision@5	0.96
-Recall@5	0.5524
-MRR	1.0
+The recorded evaluation uses 21 synthetic mentee queries and 14 synthetic mentors. Relevance is based on whether a mentor is in the same career area as the mentee. It compares random ranking, TF-IDF keyword ranking, the pretrained `all-MiniLM-L6-v2` model, and the fine-tuned model.
 
-These results matched the TF-IDF baseline on the reported metrics. They should not be interpreted as evidence that the fine-tuned model outperforms TF-IDF or as a measure of performance on real alumni data.
+**Full profiles** (domain, career path, skills, and goals):
 
-⸻
+| System | Precision@1 | Precision@3 | Recall@3 | MRR |
+|---|---:|---:|---:|---:|
+| TF-IDF keyword | 1.000 | 0.667 | 1.000 | 1.000 |
+| Pretrained MiniLM | 1.000 | 0.667 | 1.000 | 1.000 |
+| Fine-tuned MiniLM | 1.000 | 0.667 | 1.000 | 1.000 |
 
-🧪 Testing
+**Cold profiles** (skills and goals only):
 
-The backend uses Pytest for automated testing.
+| System | Precision@1 | Precision@3 | Recall@3 | MRR |
+|---|---:|---:|---:|---:|
+| TF-IDF keyword | 1.000 | 0.508 | 0.762 | 1.000 |
+| Pretrained MiniLM | 0.952 | 0.619 | 0.929 | 0.968 |
+| Fine-tuned MiniLM | 0.952 | 0.635 | 0.952 | 0.968 |
 
-From the backend directory, run:
+These results show a small synthetic baseline: the fine-tuned model matches the keyword baseline on full profiles and has slightly higher Precision@3 and Recall@3 on cold profiles. They do not establish that it outperforms the keyword baseline overall or predict performance on real alumni data. The evaluation script and complete results are in `backend/evaluation/eval_matching.py` and `docs/evidence/matching_eval.md`.
 
-python -m pytest tests/ -v
+Ask the library retrieval evaluation is also synthetic and retrieval-only; it does not call the LLM. Its results are in `docs/evidence/rag_eval.md`.
 
-The latest recorded backend test run completed successfully:
+## Known limitations
 
-34 passed, 2 deprecation warnings.
+- No automated frontend or end-to-end tests yet; browser workflows are checked manually.
+- Mentor matching has only a small synthetic baseline evaluation (21 queries, author-labelled); it does not show the fine-tuned model beating a keyword baseline.
+- No performance, load or usability measurements yet.
+- Email delivery depends on SMTP configuration; social sign-in needs registered provider apps.
+- Ask the library requires both an embedding model and an LLM API key for generated answers; its retrieval evaluation uses a small synthetic question set.
+- No production deployment yet (planned for Sprint III).
 
-The test suite covers:
+## Security
 
-* Authentication
-* Access control
-* Mentor matching
-* Mentorship workflows
-* Profile endpoints
-* Vector-store functionality
+Passwords are hashed, and API access uses expiring JWT bearer tokens with role and ownership checks. New accounts require email verification and password sign-in can require an emailed one-time code; these settings are configurable for development and tests. Clerk sign-in is optional. Administrative APIs are role-protected, and first-admin setup uses an audited one-time bootstrap flow. Workspace notes enforce author-only access for private notes. Store credentials in the local root `.env` or appropriate deployment secrets; `.env` is ignored by Git and must never be committed. This project is a development prototype and has not undergone production security review.
 
-End-to-end frontend verification and additional integration testing remain part of ongoing development.
+## Academic context
 
-⸻
+AlumniConnect is a final-year Computer Science project using Kenya Airways as the industry context. It applies software engineering, machine learning, database, and web development methods to alumni engagement and mentorship.
 
-🔐 Security
+## Author
 
-The system incorporates:
+Senetwo — Computer Science final-year project.
 
-* Password hashing
-* JWT-based authentication
-* Role-based authorization
-* Protected API endpoints
-* User-specific profile access
-* Ownership checks for mentorship request responses
-* Environment-based configuration for sensitive credentials
+## License
 
-The project is currently a development prototype and requires further security testing before production deployment.
-
-⸻
-
-📈 Current Development Status
-
-AlumniConnect is under active development.
-
-The core backend services and automated tests are functional. Frontend implementation and end-to-end integration are ongoing, including verification of the complete mentor–mentee workflow.
-
-Knowledge management, notifications, and other extended community features are planned for future development.
-
-⸻
-
-🎓 Academic Context
-
-AlumniConnect is being developed as a final-year Computer Science project, with Kenya Airways serving as the industry context for the proposed alumni engagement platform.
-
-The system demonstrates the application of software engineering, artificial intelligence, database management, and web technologies to professional networking and mentorship.
-
-⸻
-
-👩‍💻 Author
-
-Senetwo
-
-Computer Science Final-Year Project
-
-GitHub: Senetwo
-
-⸻
-
-📄 License
-
-No open-source license has been specified. All rights remain reserved unless a license is added to the repository.
+No open-source license is currently specified in this repository.

@@ -1,4 +1,5 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Text
+
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 
 from app.database.database import Base
@@ -26,6 +27,9 @@ class Profile(Base):
     mentorship_interests = Column(Text, nullable=True)
     availability = Column(String(100), nullable=False)
     bio = Column(Text, nullable=True)
+
+    profile_picture_url = Column(String(1000), nullable=True)
+    directory_visible = Column(Boolean, nullable=False, default=False)
 
     user = relationship(
         "User",

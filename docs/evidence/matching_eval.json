@@ -1,0 +1,65 @@
+{
+  "meta": {
+    "n_mentors": 14,
+    "n_queries": 21,
+    "relevance": "binary: mentor in same career area as mentee",
+    "seed": 42,
+    "fine_tuned_model_path": "C:\\Users\\senet\\Documents\\AlumniConnect\\backend\\ml_models\\alumniconnect_sbert_finetuned",
+    "base_model": "sentence-transformers/all-MiniLM-L6-v2",
+    "skipped_systems": {}
+  },
+  "results": {
+    "full": {
+      "random": {
+        "p@1": 0.048,
+        "p@3": 0.063,
+        "recall@3": 0.095,
+        "mrr": 0.24
+      },
+      "tfidf-keyword": {
+        "p@1": 1.0,
+        "p@3": 0.667,
+        "recall@3": 1.0,
+        "mrr": 1.0
+      },
+      "base-minilm": {
+        "p@1": 1.0,
+        "p@3": 0.667,
+        "recall@3": 1.0,
+        "mrr": 1.0
+      },
+      "fine-tuned": {
+        "p@1": 1.0,
+        "p@3": 0.667,
+        "recall@3": 1.0,
+        "mrr": 1.0
+      }
+    },
+    "cold": {
+      "random": {
+        "p@1": 0.19,
+        "p@3": 0.143,
+        "recall@3": 0.214,
+        "mrr": 0.376
+      },
+      "tfidf-keyword": {
+        "p@1": 1.0,
+        "p@3": 0.508,
+        "recall@3": 0.762,
+        "mrr": 1.0
+      },
+      "base-minilm": {
+        "p@1": 0.952,
+        "p@3": 0.619,
+        "recall@3": 0.929,
+        "mrr": 0.968
+      },
+      "fine-tuned": {
+        "p@1": 0.952,
+        "p@3": 0.635,
+        "recall@3": 0.952,
+        "mrr": 0.968
+      }
+    }
+  }
+}

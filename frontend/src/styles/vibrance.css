@@ -1,0 +1,76 @@
+/* Colour lift. Crimson stays the brand colour; cod gray is for text and the footer, not for
+   every chip. Icon chips, avatars, tabs and sent messages get colour; status colours add
+   green, amber and blue where they carry meaning. Dark mode redefines the tint variables. */
+:root {
+  --tint-red-bg: #fde8e9;   --tint-red-fg: #d10613;
+  --tint-green-bg: #e1f6e8; --tint-green-fg: #137a3a;
+  --tint-amber-bg: #fff0d1; --tint-amber-fg: #a85a06;
+  --tint-blue-bg: #e2ecff;  --tint-blue-fg: #1d4ed8;
+  --tint-violet-bg: #efe8ff; --tint-violet-fg: #6d28d9;
+  --gradient-brand: linear-gradient(135deg, #e20714 0%, #ff4a55 100%);
+}
+
+/* Soft page glow so large surfaces are not flat. */
+body { background-image: radial-gradient(900px 420px at 100% -80px, rgba(226, 7, 20, 0.07), transparent 70%), radial-gradient(700px 360px at -10% 0, rgba(22, 163, 74, 0.05), transparent 70%); background-repeat: no-repeat; background-attachment: fixed; }
+
+/* ---- Icon chips: tinted, with a coloured icon ---- */
+.pg-stat-icon,
+.admin-metric-icon,
+.admin-total-icon,
+.admin-ops-summary-icon,
+.admin-activity-icon,
+.admin-attention-row-icon,
+.knowledge-resource-card .knowledge-resource-icon,
+.notification-type-icon:not(.is-read) { background: var(--tint-red-bg); color: var(--tint-red-fg); }
+.pg-stats .pg-stat:nth-child(2) .pg-stat-icon { background: var(--tint-green-bg); color: var(--tint-green-fg); }
+.pg-stats .pg-stat:nth-child(3) .pg-stat-icon { background: var(--tint-amber-bg); color: var(--tint-amber-fg); }
+.pg-stats .pg-stat:nth-child(4) .pg-stat-icon { background: var(--tint-blue-bg); color: var(--tint-blue-fg); }
+.pg-stat.is-accent .pg-stat-icon { background: var(--gradient-brand); color: #fff; }
+.tone-blue { background: var(--tint-blue-bg); color: var(--tint-blue-fg); }
+.tone-green { background: var(--tint-green-bg); color: var(--tint-green-fg); }
+.tone-violet { background: var(--tint-violet-bg); color: var(--tint-violet-fg); }
+.tone-amber { background: var(--tint-amber-bg); color: var(--tint-amber-fg); }
+.tone-red { background: var(--tint-red-bg); color: var(--tint-red-fg); }
+.admin-ops-summary article:nth-child(2) .admin-ops-summary-icon { background: var(--tint-amber-bg); color: var(--tint-amber-fg); }
+.admin-ops-summary article:nth-child(3) .admin-ops-summary-icon { background: var(--tint-blue-bg); color: var(--tint-blue-fg); }
+.admin-activity-card:nth-child(2) .admin-activity-icon { background: var(--tint-green-bg); color: var(--tint-green-fg); }
+.admin-activity-card:nth-child(3) .admin-activity-icon { background: var(--tint-violet-bg); color: var(--tint-violet-fg); }
+.admin-metric-grid .admin-metric-card:nth-child(2) .admin-metric-icon { background: var(--tint-green-bg); color: var(--tint-green-fg); }
+.admin-metric-grid .admin-metric-card:nth-child(3) .admin-metric-icon { background: var(--tint-violet-bg); color: var(--tint-violet-fg); }
+.admin-metric-grid .admin-metric-card:nth-child(4) .admin-metric-icon { background: var(--tint-amber-bg); color: var(--tint-amber-fg); }
+
+/* ---- Avatars, active tabs and sent messages ---- */
+.ch-avatar, .pg-avatar, .profile-avatar-preview, .ch-thread-empty span { background: var(--gradient-brand); color: #fff; }
+.ch-bubble.is-mine { background: var(--color-accent); }
+.pg-tabs button.is-active,
+.admin-ops-tabs button.is-selected { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
+.pg-tabs button.is-active span,
+.admin-ops-tabs button.is-selected .admin-tab-count { background: #fff; color: var(--color-accent-hover); }
+
+/* ---- Meaningful states ---- */
+.pg-chip.is-confirmed, .pg-chip.is-accepted,
+.request-accepted { background: var(--tint-green-bg); border-color: transparent; color: var(--tint-green-fg); }
+.admin-role-pill.role-admin { background: var(--gradient-brand); color: #fff; }
+.admin-knowledge-page .bg-green-100 { background: var(--tint-green-bg); color: var(--tint-green-fg); }
+.pf-checklist li.is-done svg { background: #16a34a; }
+.profile-completion-dot, .auth-security-note > span { background: #16a34a; }
+.auth-security-note > span { box-shadow: 0 0 0 4px var(--tint-green-bg); }
+.status-active i, .verified i, .status-accepted i { background: #16a34a; }
+
+/* Footer: cod gray with the same crimson glow as the landing panels, not flat black. */
+.lp-footer { background: radial-gradient(700px 260px at 100% 0, rgba(226, 7, 20, 0.32), transparent 70%), #1c1c1c; }
+
+/* Calendar: available is green, booked is blue, so the two never read as the same state. */
+.available-marker, .booked-marker { width: 9px; height: 9px; }
+.available-marker { background: #16a34a; }
+.booked-marker { background: #2563eb; }
+.calendar-legend { gap: 22px; }
+.calendar-legend span { font-weight: 600; color: #4d4d4d; }
+.availability-slot-item.is-available { background: #f1faf4; border-color: #b7e3c6; }
+.availability-slot-item.is-available .availability-slot-indicator { background: #16a34a; }
+.availability-slot-item.is-booked { background: #eef3ff; border-color: #c3d4fb; }
+.availability-slot-item.is-booked .availability-slot-indicator { background: #2563eb; }
+.availability-slot-item.is-booked a { color: #1d4ed8; }
+.availability-slot-item.is-available small { color: #0b6b34; }
+.availability-slot-item.is-booked small { color: #1d4ed8; }
+.pg-chip.is-confirmed { background: #e8efff; border-color: #c3d4fb; color: #1d4ed8; }
